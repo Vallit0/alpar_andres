@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlparBot - AI Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <button class="menu-button" id="menuButton">
+            <i class="fas fa-bars"></i>
+        </button>
+        <button class="add-button" id="addButton">
+            <i class="fas fa-plus"></i>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Welcome Message (Centered) -->
+        <div class="welcome-section" id="welcomeSection">
+            <div class="welcome-icon">
+                <img src="ALPAR.png" alt="ALPAR Logo" class="alpar-logo">
+            </div>
+            <h1 class="welcome-text">¡Hazme una pregunta sobre ALPAR!</h1>
+        </div>
+
+        <!-- Chat Messages (Hidden initially) -->
+        <div class="chat-messages" id="chatMessages" style="display: none;">
+            <!-- Messages will be added here dynamically -->
+        </div>
+    </main>
+
+    <!-- Bottom Input Bar -->
+    <div class="bottom-input-bar">
+        <div class="input-container">
+            <!-- Left side buttons -->
+            <div class="input-left">
+                <button class="pill-button deepthink-button">
+                    <span>AlparStats</span>
+                </button>
+                
+            </div>
+
+            <!-- Center input -->
+            <div class="input-center">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Message AIpar"
+                    maxlength="1000"
+                >
+            </div>
+
+            <!-- Right side buttons -->
+            <div class="input-right">
+                <button class="attach-button" id="attachButton">
+                    <i class="fas fa-paperclip"></i>
+                </button>
+                <button class="send-button" id="sendButton">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <img src="ALPAR.png" alt="ALPAR Logo" class="loading-logo">
+            <p>Inicializando ALPAR...</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo de Gráficas - AlparBot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-chart-line"></i>
+                    <h1>Demo de Gráficas</h1>
+                </div>
+                <div class="status">
+                    <i class="fas fa-circle status-indicator online"></i>
+                    <span>Visualización de datos</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Los mensajes se generarán dinámicamente -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configurar marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (err) {
+                        console.warn('Error highlighting code:', err);
+                    }
+                }
+                return code;
+            },
+            breaks: true,
+            gfm: true,
+            sanitize: false
+        });
+
+        // Configurar Chart.js para tema oscuro
+        Chart.defaults.color = '#ecf0f1';
+        Chart.defaults.borderColor = 'rgba(46, 204, 113, 0.3)';
+        Chart.defaults.backgroundColor = 'rgba(46, 204, 113, 0.1)';
+
+        // Función para renderizar markdown
+        function renderMarkdown(content) {
+            let html = marked.parse(content);
+            html = processChartBlocks(html);
+            return html;
+        }
+
+        // Función para procesar bloques de gráficas
+        function processChartBlocks(html) {
+            const chartRegex = /<chart\s+type="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+description="([^"]*)")?(?:\s+data="([^"]*)")?><\/chart>/gi;
+            
+            return html.replace(chartRegex, (match, type, title, description, data) => {
+                const chartId = 'chart_' + Math.random().toString(36).substr(2, 9);
+                const chartTitle = title || `${type.charAt(0).toUpperCase() + type.slice(1)} Chart`;
+                const chartDescription = description || '';
+                
+                return `
+                    <div class="chart-container">
+                        <div class="chart-title">${chartTitle}</div>
+                        <div class="chart-loading">
+                            <i class="fas fa-spinner"></i>
+                            Generando gráfica...
+                        </div>
+                        <canvas id="${chartId}" style="display: none;"></canvas>
+                        ${chartDescription ? `<div class="chart-description">${chartDescription}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        // Función para agregar mensaje
+        function addMessage(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            
+            if (role === 'user') {
+                avatar.innerHTML = '<i class="fas fa-user"></i>';
+            } else {
+                avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            }
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = `<div class="markdown-content">${renderMarkdown(content)}</div>`;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Renderizar gráficas después de un breve delay
+            setTimeout(() => {
+                renderCharts();
+            }, 100);
+        }
+
+        // Función para renderizar gráficas
+        function renderCharts() {
+            const chartContainers = document.querySelectorAll('.chart-container');
+            
+            chartContainers.forEach(container => {
+                const canvas = container.querySelector('canvas');
+                const loading = container.querySelector('.chart-loading');
+                
+                if (canvas && loading && !canvas.chart) {
+                    const chartData = generateChartData(canvas.id);
+                    
+                    loading.style.display = 'none';
+                    canvas.style.display = 'block';
+                    
+                    createChart(canvas, chartData);
+                }
+            });
+        }
+
+        // Función para generar datos de gráficas
+        function generateChartData(chartId) {
+            const chartTypes = {
+                'line': {
+                    type: 'line',
+                    data: {
+                        labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio'],
+                        datasets: [{
+                            label: 'Ventas',
+                            data: [12, 19, 3, 5, 2, 3],
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.2)',
+                            tension: 0.1
+                        }]
+                    }
+                },
+                'bar': {
+                    type: 'bar',
+                    data: {
+                        labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                        datasets: [{
+                            label: 'Ingresos',
+                            data: [65, 59, 80, 81],
+                            backgroundColor: [
+                                'rgba(46, 204, 113, 0.8)',
+                                'rgba(52, 152, 219, 0.8)',
+                                'rgba(155, 89, 182, 0.8)',
+                                'rgba(241, 196, 15, 0.8)'
+                            ]
+                        }]
+                    }
+                },
+                'pie': {
+                    type: 'pie',
+                    data: {
+                        labels: ['Desktop', 'Mobile', 'Tablet'],
+                        datasets: [{
+                            data: [45, 35, 20],
+                            backgroundColor: [
+                                '#2ecc71',
+                                '#3498db',
+                                '#f39c12'
+                            ]
+                        }]
+                    }
+                },
+                'doughnut': {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Desarrollo', 'Testing', 'Producción'],
+                        datasets: [{
+                            data: [40, 30, 30],
+                            backgroundColor: [
+                                '#2ecc71',
+                                '#e74c3c',
+                                '#f39c12'
+                            ]
+                        }]
+                    }
+                },
+                'radar': {
+                    type: 'radar',
+                    data: {
+                        labels: ['Ventas', 'Marketing', 'Desarrollo', 'Soporte', 'Administración'],
+                        datasets: [{
+                            label: 'Equipo A',
+                            data: [65, 59, 90, 81, 56],
+                            borderColor: '#2ecc71',
+                            backgroundColor: 'rgba(46, 204, 113, 0.2)'
+                        }]
+                    }
+                }
+            };
+
+            // Seleccionar tipo de gráfica basado en el ID
+            const types = Object.keys(chartTypes);
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            return chartTypes[randomType];
+        }
+
+        // Función para crear gráfica
+        function createChart(canvas, chartConfig) {
+            try {
+                canvas.chart = new Chart(canvas, {
+                    type: chartConfig.type,
+                    data: chartConfig.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ecf0f1'
+                                }
+                            }
+                        },
+                        scales: chartConfig.type !== 'pie' && chartConfig.type !== 'doughnut' ? {
+                            x: {
+                                ticks: {
+                                    color: '#ecf0f1'
+                                },
+                                grid: {
+                                    color: 'rgba(46, 204, 113, 0.1)'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#ecf0f1'
+                                },
+                                grid: {
+                                    color: 'rgba(46, 204, 113, 0.1)'
+                                }
+                            }
+                        } : {}
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating chart:', error);
+            }
+        }
+
+        // Ejemplos de gráficas
+        const examples = [
+            {
+                role: 'assistant',
+                content: `# 📊 Demostración de Gráficas Interactivas
+
+¡Bienvenido a la demostración de capacidades de visualización de datos de AlparBot!
+
+## Tipos de Gráficas Soportadas
+
+### 1. Gráfica de Líneas
+<chart type="line" title="Tendencias de Ventas" description="Evolución de las ventas durante el primer semestre"></chart>
+
+### 2. Gráfica de Barras
+<chart type="bar" title="Ingresos por Trimestre" description="Comparación de ingresos por trimestre"></chart>
+
+### 3. Gráfica Circular (Pie)
+<chart type="pie" title="Distribución de Dispositivos" description="Porcentaje de uso por tipo de dispositivo"></chart>
+
+### 4. Gráfica de Dona (Doughnut)
+<chart type="doughnut" title="Entornos de Desarrollo" description="Distribución de recursos por entorno"></chart>
+
+### 5. Gráfica de Radar
+<chart type="radar" title="Evaluación de Equipos" description="Rendimiento por área de trabajo"></chart>`
+            },
+            {
+                role: 'assistant',
+                content: `## 🚀 Características de las Gráficas
+
+### **Integración con Azure AI Projects**
+- Datos en tiempo real desde Azure
+- Métricas de rendimiento automáticas
+- Análisis predictivo integrado
+
+### **Tipos de Datos Soportados**
+- **Métricas de uso**: CPU, memoria, almacenamiento
+- **Rendimiento**: Tiempo de respuesta, throughput
+- **Errores**: Logs de errores, excepciones
+- **Usuarios**: Actividad, sesiones, conversiones
+
+### **Personalización**
+- Temas adaptativos (claro/oscuro)
+- Colores personalizables
+- Animaciones suaves
+- Responsive design
+
+### **API Endpoints Disponibles**
+\`\`\`javascript
+// Obtener datos de gráfica
+GET /api/chart-data/line?period=30d&metric=usage
+
+// Parámetros disponibles:
+// - type: line, bar, pie, doughnut, radar
+// - period: 7d, 30d, 90d
+// - metric: usage, performance, errors, requests
+\`\`\`
+
+¿Te gustaría ver algún tipo específico de gráfica o datos particulares?`
+            }
+        ];
+
+        // Mostrar ejemplos al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            examples.forEach((example, index) => {
+                setTimeout(() => {
+                    addMessage(example.role, example.content);
+                }, index * 5000); // Mostrar cada mensaje con 3 segundos de diferencia
+            });
+        });
+    </script>
+</body>
+</html>

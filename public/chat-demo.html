@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Chat Avanzado - AlparBot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <button class="menu-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <button class="add-button" onclick="showDemo()">
+            <i class="fas fa-play"></i>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Welcome Message (Centered) -->
+        <div class="welcome-section" id="welcomeSection">
+            <div class="welcome-icon">
+                <i class="fas fa-comments"></i>
+            </div>
+            <h1 class="welcome-text">Demo de Chat Avanzado</h1>
+            <p style="color: #8E8E93; margin-top: 16px; font-size: 16px;">
+                Explora las nuevas funcionalidades del chat de IA
+            </p>
+        </div>
+
+        <!-- Chat Messages (Hidden initially) -->
+        <div class="chat-messages" id="chatMessages" style="display: none;">
+            <!-- Messages will be added here dynamically -->
+        </div>
+    </main>
+
+    <!-- Bottom Input Bar -->
+    <div class="bottom-input-bar">
+        <div class="input-container">
+            <!-- Left side buttons -->
+            <div class="input-left">
+                <button class="pill-button deepthink-button" onclick="addThinkingDemo()">
+                    <span>Thinking</span>
+                </button>
+                <button class="pill-button search-button" onclick="addReasoningDemo()">
+                    <i class="fas fa-brain"></i>
+                    <span>Reasoning</span>
+                </button>
+            </div>
+
+            <!-- Center input -->
+            <div class="input-center">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Prueba las nuevas funcionalidades..."
+                    maxlength="1000"
+                >
+            </div>
+
+            <!-- Right side buttons -->
+            <div class="input-right">
+                <button class="attach-button" onclick="addChartDemo()">
+                    <i class="fas fa-chart-bar"></i>
+                </button>
+                <button class="send-button" id="sendButton" onclick="sendDemoMessage()">
+                    <i class="fas fa-arrow-up"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configurar marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (err) {
+                        console.warn('Error highlighting code:', err);
+                    }
+                }
+                return code;
+            },
+            breaks: true,
+            gfm: true,
+            sanitize: false
+        });
+
+        // Configurar Chart.js para tema oscuro
+        Chart.defaults.color = '#ecf0f1';
+        Chart.defaults.borderColor = 'rgba(46, 204, 113, 0.3)';
+        Chart.defaults.backgroundColor = 'rgba(46, 204, 113, 0.1)';
+
+        let chatMessages, welcomeSection, messageInput;
+        let isFirstMessage = true;
+
+        // Initialize elements
+        document.addEventListener('DOMContentLoaded', () => {
+            chatMessages = document.getElementById('chatMessages');
+            welcomeSection = document.getElementById('welcomeSection');
+            messageInput = document.getElementById('messageInput');
+        });
+
+        // Show demo
+        function showDemo() {
+            if (isFirstMessage) {
+                welcomeSection.classList.add('hide');
+                chatMessages.classList.add('show');
+                chatMessages.style.display = 'block';
+                isFirstMessage = false;
+            }
+            
+            addMessage('assistant', `# 🚀 Funcionalidades del Chat Avanzado
+
+## **Burbujas de Chat Mejoradas**
+
+### **Mensajes del Usuario (Derecha)**
+- Burbujas azules con bordes redondeados
+- Opciones de **copiar** y **editar** al hacer hover
+- Sombra sutil para profundidad
+
+### **Mensajes del Asistente (Izquierda)**
+- Burbujas grises más amplias
+- Opciones de **copiar** y **regenerar** respuesta
+- Soporte para contenido rico y complejo
+
+## **Bloques Especiales**
+
+### **Bloques de Pensamiento Colapsables**
+- Títulos como "Thought for 8 seconds"
+- Contenido expandible/colapsable
+- Iconos animados
+
+### **Bloques de Razonamiento**
+- Secciones explicativas
+- Contenido detallado colapsable
+- Organización clara del pensamiento
+
+### **Respuestas Finales Destacadas**
+- Respuestas principales resaltadas
+- Borde azul distintivo
+- Texto más grande y claro
+
+## **Interacciones Avanzadas**
+
+- **Hover effects** en todos los elementos
+- **Animaciones suaves** de entrada
+- **Indicador de escritura** animado
+- **Acciones contextuales** en mensajes
+
+¡Prueba los botones de arriba para ver cada funcionalidad en acción!`);
+        }
+
+        // Add message function
+        function addMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+
+            // For assistant messages, render directly as markdown without bubble
+            if (role === 'assistant') {
+                // Process content with Markdown support and special blocks
+                const processedContent = processSpecialBlocks(content);
+                const renderedContent = renderMarkdown(processedContent);
+                
+                // Create a simple div for assistant content (no bubble)
+                const assistantContent = document.createElement('div');
+                assistantContent.className = 'assistant-content';
+                assistantContent.innerHTML = `<div class="markdown-content">${renderedContent}</div>`;
+                
+                messageDiv.appendChild(assistantContent);
+                
+                // Add message actions for assistant messages
+                const actions = createMessageActions(role, content);
+                messageDiv.appendChild(actions);
+            } else {
+                // User messages keep the bubble style
+                const messageContent = document.createElement('div');
+                messageContent.className = 'message-content';
+                
+                // Add message actions for user messages
+                const actions = createMessageActions(role, content);
+                messageDiv.appendChild(actions);
+                
+                // Render content with Markdown support
+                const renderedContent = renderMarkdown(content);
+                messageContent.innerHTML = `<div class="markdown-content">${renderedContent}</div>`;
+
+                messageDiv.appendChild(messageContent);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+            
+            // Initialize collapsible blocks and render charts
+            setTimeout(() => {
+                initializeCollapsibleBlocks();
+                renderCharts();
+            }, 100);
+        }
+
+        // Create message actions
+        function createMessageActions(role, content) {
+            const actions = document.createElement('div');
+            actions.className = 'message-actions';
+            
+            // Copy button
+            const copyButton = document.createElement('button');
+            copyButton.className = 'action-button';
+            copyButton.innerHTML = '<i class="fas fa-copy"></i>';
+            copyButton.title = 'Copiar mensaje';
+            copyButton.addEventListener('click', () => copyMessage(content));
+            
+            // Edit button (only for user messages)
+            if (role === 'user') {
+                const editButton = document.createElement('button');
+                editButton.className = 'action-button';
+                editButton.innerHTML = '<i class="fas fa-edit"></i>';
+                editButton.title = 'Editar mensaje';
+                actions.appendChild(editButton);
+            }
+            
+            // Regenerate button (only for assistant messages)
+            if (role === 'assistant') {
+                const regenerateButton = document.createElement('button');
+                regenerateButton.className = 'action-button';
+                regenerateButton.innerHTML = '<i class="fas fa-redo"></i>';
+                regenerateButton.title = 'Regenerar respuesta';
+                actions.appendChild(regenerateButton);
+            }
+            
+            actions.appendChild(copyButton);
+            return actions;
+        }
+
+        // Copy message function
+        function copyMessage(content) {
+            navigator.clipboard.writeText(content).then(() => {
+                const button = event.target.closest('.action-button');
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i>';
+                button.style.color = '#4CAF50';
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.style.color = '';
+                }, 1000);
+            });
+        }
+
+        // Demo functions
+        function addThinkingDemo() {
+            if (isFirstMessage) showDemo();
+            
+            addMessage('assistant', `Thought for 8 seconds
+
+Analizando la pregunta del usuario sobre las funcionalidades del chat...
+
+1. **Identificando componentes clave**: Burbujas, acciones, bloques colapsables
+2. **Evaluando interacciones**: Hover effects, animaciones, feedback visual
+3. **Considerando UX**: Flujo natural, accesibilidad, responsividad
+
+Final Answer: ¡Hola! 👋 
+
+He estado pensando en tu pregunta y aquí tienes una demostración completa de todas las funcionalidades del chat avanzado. Los bloques de pensamiento te permiten ver el proceso de razonamiento, mientras que las respuestas finales están claramente destacadas.`);
+        }
+
+        function addReasoningDemo() {
+            if (isFirstMessage) showDemo();
+            
+            addMessage('assistant', `Reasoning:
+
+Para crear un chat de IA efectivo, necesitamos considerar varios aspectos:
+
+**1. Estructura Visual**
+- Diferenciación clara entre usuario y asistente
+- Jerarquía visual apropiada
+- Espaciado y tipografía consistentes
+
+**2. Interacciones**
+- Feedback inmediato en acciones
+- Estados de carga claros
+- Animaciones que guían la atención
+
+**3. Funcionalidades Avanzadas**
+- Edición de mensajes
+- Regeneración de respuestas
+- Bloques explicativos colapsables
+
+**4. Accesibilidad**
+- Navegación por teclado
+- Contraste adecuado
+- Textos descriptivos
+
+Final Answer: El diseño del chat combina funcionalidad avanzada con una experiencia de usuario intuitiva y elegante.`);
+        }
+
+        function addChartDemo() {
+            if (isFirstMessage) showDemo();
+            
+            addMessage('assistant', `# 📊 Análisis de Datos
+
+Aquí tienes una visualización de las métricas de uso del chat:
+
+<chart type="line" title="Mensajes por Día" description="Tendencia de actividad en los últimos 7 días"></chart>
+
+**Interpretación:**
+- Pico de actividad los martes y jueves
+- Crecimiento constante en el uso
+- Mayor engagement en horarios laborales
+
+<chart type="pie" title="Tipos de Consultas" description="Distribución de tipos de preguntas"></chart>
+
+**Conclusiones:**
+- 45% consultas técnicas
+- 35% preguntas generales  
+- 20% solicitudes de análisis
+
+Los datos muestran un patrón de uso saludable y creciente.`);
+        }
+
+        function sendDemoMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            if (isFirstMessage) showDemo();
+            
+            addMessage('user', message);
+            messageInput.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                addMessage('assistant', `Entiendo tu mensaje: "${message}"
+
+Esta es una respuesta de demostración que muestra cómo se ve un mensaje del asistente con todas las funcionalidades activas:
+
+- **Burbuja amplia** con contenido rico
+- **Opciones de acción** (copiar/regenerar)
+- **Soporte completo de Markdown**
+- **Animaciones suaves**
+
+¿Te gustaría probar alguna funcionalidad específica?`);
+            }, 1000);
+        }
+
+        // Utility functions
+        function processSpecialBlocks(content) {
+            // Process thinking blocks (like "Thought for X seconds")
+            content = content.replace(/Thought for (\d+) seconds?/gi, (match, seconds) => {
+                return `<thinking-block seconds="${seconds}">${match}</thinking-block>`;
+            });
+            
+            // Process reasoning blocks
+            content = content.replace(/Reasoning:/gi, '<reasoning-block>Reasoning:');
+            content = content.replace(/Final Answer:/gi, '</reasoning-block><final-answer>Final Answer:');
+            content = content.replace(/Final answer:/gi, '</reasoning-block><final-answer>Final answer:');
+            
+            return content;
+        }
+
+        function renderMarkdown(content) {
+            if (typeof marked !== 'undefined') {
+                try {
+                    let html = marked.parse(content);
+                    html = processChartBlocks(html);
+                    html = processSpecialBlocksHTML(html);
+                    return html;
+                } catch (error) {
+                    return escapeHtml(content);
+                }
+            }
+            return escapeHtml(content);
+        }
+
+        function processChartBlocks(html) {
+            const chartRegex = /<chart\s+type="([^"]+)"(?:\s+title="([^"]*)")?(?:\s+description="([^"]*)")?(?:\s+data="([^"]*)")?><\/chart>/gi;
+            
+            return html.replace(chartRegex, (match, type, title, description, data) => {
+                const chartId = 'chart_' + Math.random().toString(36).substr(2, 9);
+                const chartTitle = title || `${type.charAt(0).toUpperCase() + type.slice(1)} Chart`;
+                const chartDescription = description || '';
+                
+                return `
+                    <div class="chart-container">
+                        <div class="chart-title">${chartTitle}</div>
+                        <div class="chart-loading">
+                            <i class="fas fa-spinner"></i>
+                            Generando gráfica...
+                        </div>
+                        <canvas id="${chartId}" style="display: none;"></canvas>
+                        ${chartDescription ? `<div class="chart-description">${chartDescription}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        function processSpecialBlocksHTML(html) {
+            // Process thinking blocks
+            html = html.replace(/Thought for (\d+) seconds?/gi, (match, seconds) => {
+                const blockId = 'thinking_' + Math.random().toString(36).substr(2, 9);
+                return `
+                    <div class="collapsible-block" id="${blockId}">
+                        <div class="collapsible-header" onclick="toggleCollapsible('${blockId}')">
+                            <i class="fas fa-chevron-right collapsible-icon"></i>
+                            <span class="collapsible-title">${match}</span>
+                        </div>
+                        <div class="collapsible-content">
+                            <p>Procesando pensamiento por ${seconds} segundos...</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Process reasoning blocks
+            html = html.replace(/Reasoning:/gi, '<reasoning-block>Reasoning:');
+            html = html.replace(/Final Answer:/gi, '</reasoning-block><final-answer>Final Answer:');
+            html = html.replace(/Final answer:/gi, '</reasoning-block><final-answer>Final answer:');
+
+            html = html.replace(/<reasoning-block>(.*?)<\/reasoning-block>/gi, (match, content) => {
+                const blockId = 'reasoning_' + Math.random().toString(36).substr(2, 9);
+                return `
+                    <div class="collapsible-block" id="${blockId}">
+                        <div class="collapsible-header" onclick="toggleCollapsible('${blockId}')">
+                            <i class="fas fa-chevron-right collapsible-icon"></i>
+                            <span class="collapsible-title">Razonamiento</span>
+                        </div>
+                        <div class="collapsible-content">
+                            ${content}
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Process final answer blocks
+            html = html.replace(/<final-answer>(.*?)(?=<|$)/gi, (match, content) => {
+                return `
+                    <div class="final-response">
+                        <div class="final-response-text">${content}</div>
+                    </div>
+                `;
+            });
+
+            return html;
+        }
+
+        function initializeCollapsibleBlocks() {
+            const collapsibleBlocks = document.querySelectorAll('.collapsible-block');
+            collapsibleBlocks.forEach(block => {
+                const header = block.querySelector('.collapsible-header');
+                if (header && !header.hasAttribute('data-initialized')) {
+                    header.setAttribute('data-initialized', 'true');
+                    header.addEventListener('click', () => {
+                        toggleCollapsible(block.id);
+                    });
+                }
+            });
+        }
+
+        function toggleCollapsible(blockId) {
+            const block = document.getElementById(blockId);
+            if (block) {
+                block.classList.toggle('expanded');
+            }
+        }
+
+        function renderCharts() {
+            const chartContainers = document.querySelectorAll('.chart-container');
+            
+            chartContainers.forEach(container => {
+                const canvas = container.querySelector('canvas');
+                const loading = container.querySelector('.chart-loading');
+                
+                if (canvas && loading && !canvas.chart) {
+                    const chartData = generateChartData(canvas.id);
+                    
+                    loading.style.display = 'none';
+                    canvas.style.display = 'block';
+                    
+                    createChart(canvas, chartData);
+                }
+            });
+        }
+
+        function generateChartData(chartId) {
+            const chartTypes = {
+                'line': {
+                    type: 'line',
+                    data: {
+                        labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+                        datasets: [{
+                            label: 'Mensajes',
+                            data: [12, 19, 8, 15, 22, 18, 14],
+                            borderColor: '#007AFF',
+                            backgroundColor: 'rgba(0, 122, 255, 0.2)',
+                            tension: 0.1
+                        }]
+                    }
+                },
+                'pie': {
+                    type: 'pie',
+                    data: {
+                        labels: ['Técnicas', 'Generales', 'Análisis'],
+                        datasets: [{
+                            data: [45, 35, 20],
+                            backgroundColor: ['#007AFF', '#34C759', '#FF9500']
+                        }]
+                    }
+                }
+            };
+
+            const types = Object.keys(chartTypes);
+            const randomType = types[Math.floor(Math.random() * types.length)];
+            return chartTypes[randomType];
+        }
+
+        function createChart(canvas, chartConfig) {
+            try {
+                canvas.chart = new Chart(canvas, {
+                    type: chartConfig.type,
+                    data: chartConfig.data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ecf0f1'
+                                }
+                            }
+                        },
+                        scales: chartConfig.type !== 'pie' && chartConfig.type !== 'doughnut' ? {
+                            x: {
+                                ticks: {
+                                    color: '#ecf0f1'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    color: '#ecf0f1'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                }
+                            }
+                        } : {}
+                    }
+                });
+            } catch (error) {
+                console.error('Error creating chart:', error);
+            }
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Handle Enter key
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendDemoMessage();
+            }
+        });
+    </script>
+</body>
+</html>

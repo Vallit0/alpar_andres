@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Markdown - AlparBot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>Prueba de Markdown</h1>
+                </div>
+                <div class="status">
+                    <i class="fas fa-circle status-indicator online"></i>
+                    <span>Demo de capacidades</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Los mensajes se generarán dinámicamente -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Configurar marked
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (err) {
+                        console.warn('Error highlighting code:', err);
+                    }
+                }
+                return code;
+            },
+            breaks: true,
+            gfm: true,
+            sanitize: false
+        });
+
+        // Función para renderizar markdown
+        function renderMarkdown(content) {
+            return marked.parse(content);
+        }
+
+        // Función para agregar mensaje
+        function addMessage(role, content) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}-message`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            
+            if (role === 'user') {
+                avatar.innerHTML = '<i class="fas fa-user"></i>';
+            } else {
+                avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            }
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = `<div class="markdown-content">${renderMarkdown(content)}</div>`;
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Ejemplos de Markdown
+        const examples = [
+            {
+                role: 'assistant',
+                content: `# 🎉 ¡Bienvenido a la demostración de Markdown!
+
+Este es un **texto en negrita** y este es un *texto en cursiva*.
+
+## Características soportadas:
+
+### 1. Texto básico
+- **Negrita**: \`**texto**\`
+- *Cursiva*: \`*texto*\`
+- ~~Tachado~~: \`~~texto~~\`
+- \`Código inline\`: \`\`código\`\`
+
+### 2. Listas
+**Lista con viñetas:**
+- Elemento 1
+- Elemento 2
+  - Subelemento 2.1
+  - Subelemento 2.2
+
+**Lista numerada:**
+1. Primer elemento
+2. Segundo elemento
+3. Tercer elemento`
+            },
+            {
+                role: 'assistant',
+                content: `### 3. Código
+
+**Código inline:** Aquí tienes una variable \`const nombre = "AlparBot"\`
+
+**Bloque de código JavaScript:**
+\`\`\`javascript
+function saludar(nombre) {
+    console.log(\`¡Hola, \${nombre}!\`);
+    return \`Bienvenido a AlparBot\`;
+}
+
+const resultado = saludar("Usuario");
+\`\`\`
+
+**Bloque de código Python:**
+\`\`\`python
+def calcular_fibonacci(n):
+    if n <= 1:
+        return n
+    return calcular_fibonacci(n-1) + calcular_fibonacci(n-2)
+
+# Calcular los primeros 10 números
+for i in range(10):
+    print(f"F({i}) = {calcular_fibonacci(i)}")
+\`\`\``
+            },
+            {
+                role: 'assistant',
+                content: `### 4. Citas y enlaces
+
+> Esta es una cita importante. Las citas son perfectas para destacar información relevante o citar fuentes.
+
+**Enlaces:**
+- [GitHub](https://github.com)
+- [Azure AI Projects](https://azure.microsoft.com/en-us/products/ai-services/ai-projects)
+- [Markdown Guide](https://www.markdownguide.org/)
+
+### 5. Tablas
+
+| Característica | Soportado | Descripción |
+|----------------|-----------|-------------|
+| **Negrita** | ✅ | Texto en negrita |
+| *Cursiva* | ✅ | Texto en cursiva |
+| \`Código\` | ✅ | Código inline |
+| Listas | ✅ | Viñetas y numeradas |
+| Enlaces | ✅ | Enlaces externos |
+| Tablas | ✅ | Tablas organizadas |
+
+### 6. Líneas horizontales
+
+---
+
+### 7. Emojis y caracteres especiales
+
+¡Los emojis funcionan perfectamente! 🚀 🤖 💻 📝 ✨
+
+**Caracteres especiales:**
+- &copy; Copyright
+- &reg; Registrado
+- &trade; Marca comercial
+- &hearts; Corazón`
+            },
+            {
+                role: 'user',
+                content: `¡Increíble! ¿Puedes mostrarme más ejemplos de código?`
+            },
+            {
+                role: 'assistant',
+                content: `¡Por supuesto! Aquí tienes más ejemplos de código con resaltado de sintaxis:
+
+**HTML:**
+\`\`\`html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mi Página</title>
+</head>
+<body>
+    <h1>¡Hola Mundo!</h1>
+    <p>Esta es una página de ejemplo.</p>
+</body>
+</html>
+\`\`\`
+
+**CSS:**
+\`\`\`css
+.chatbot-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.message {
+    display: flex;
+    margin-bottom: 1rem;
+    animation: slideIn 0.3s ease-out;
+}
+\`\`\`
+
+**JSON:**
+\`\`\`json
+{
+    "chatbot": {
+        "name": "AlparBot",
+        "version": "1.0.0",
+        "features": [
+            "Markdown support",
+            "Code highlighting",
+            "Responsive design",
+            "Azure AI integration"
+        ],
+        "config": {
+            "maxMessageLength": 1000,
+            "enableMarkdown": true,
+            "theme": "modern"
+        }
+    }
+}
+\`\`\`
+
+**SQL:**
+\`\`\`sql
+SELECT 
+    u.name,
+    u.email,
+    COUNT(m.id) as message_count
+FROM users u
+LEFT JOIN messages m ON u.id = m.user_id
+WHERE u.created_at >= '2024-01-01'
+GROUP BY u.id, u.name, u.email
+HAVING COUNT(m.id) > 5
+ORDER BY message_count DESC;
+\`\`\`
+
+¿Te gustaría ver algún otro tipo de código o funcionalidad?`
+            }
+        ];
+
+        // Mostrar ejemplos al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            examples.forEach((example, index) => {
+                setTimeout(() => {
+                    addMessage(example.role, example.content);
+                }, index * 2000); // Mostrar cada mensaje con 2 segundos de diferencia
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Hermoso - AlparBot</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Victor+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+    <!-- Markdown and Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+<body>
+    <!-- Top Bar -->
+    <header class="top-bar">
+        <button class="menu-button" onclick="window.location.href='index.html'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <button class="add-button" onclick="showMarkdownDemo()">
+            <i class="fas fa-magic"></i>
+        </button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Welcome Message (Centered) -->
+        <div class="welcome-section" id="welcomeSection">
+            <div class="welcome-icon">
+                <i class="fas fa-paint-brush"></i>
+            </div>
+            <h1 class="welcome-text">Markdown Hermoso</h1>
+            <p style="color: #8E8E93; margin-top: 16px; font-size: 16px;">
+                Ve cómo se ve el Markdown renderizado con estilo
+            </p>
+        </div>
+
+        <!-- Markdown Demo Content -->
+        <div class="markdown-demo" id="markdownDemo" style="display: none;">
+            <div class="assistant-content">
+                <div class="markdown-content" id="markdownContent">
+                    <!-- Markdown content will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize marked with beautiful configuration
+        marked.setOptions({
+            highlight: function(code, lang) {
+                if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (err) {
+                        console.warn('Error highlighting code:', err);
+                    }
+                }
+                return code;
+            },
+            breaks: true,
+            gfm: true,
+            sanitize: false,
+            smartLists: true,
+            smartypants: true,
+            tables: true,
+            pedantic: false
+        });
+
+        // Custom renderer for beautiful styling
+        const renderer = new marked.Renderer();
+        
+        renderer.heading = function(text, level) {
+            const id = text.toLowerCase().replace(/[^\w]+/g, '-');
+            return `<h${level} id="${id}" class="markdown-heading markdown-h${level}">${text}</h${level}>`;
+        };
+        
+        renderer.paragraph = function(text) {
+            return `<p class="markdown-paragraph">${text}</p>`;
+        };
+        
+        renderer.list = function(body, ordered) {
+            const type = ordered ? 'ol' : 'ul';
+            const className = ordered ? 'markdown-ordered-list' : 'markdown-unordered-list';
+            return `<${type} class="${className}">${body}</${type}>`;
+        };
+        
+        renderer.listitem = function(text) {
+            return `<li class="markdown-list-item">${text}</li>`;
+        };
+        
+        renderer.blockquote = function(quote) {
+            return `<blockquote class="markdown-blockquote">${quote}</blockquote>`;
+        };
+        
+        renderer.code = function(code, language) {
+            const validLang = language && hljs.getLanguage(language) ? language : '';
+            const highlighted = validLang ? hljs.highlight(code, { language: validLang }).value : code;
+            return `<pre class="markdown-code-block"><code class="language-${validLang}">${highlighted}</code></pre>`;
+        };
+        
+        renderer.codespan = function(code) {
+            return `<code class="markdown-inline-code">${code}</code>`;
+        };
+        
+        renderer.link = function(href, title, text) {
+            const titleAttr = title ? ` title="${title}"` : '';
+            return `<a href="${href}"${titleAttr} class="markdown-link" target="_blank" rel="noopener noreferrer">${text}</a>`;
+        };
+        
+        renderer.table = function(header, body) {
+            return `<table class="markdown-table">${header}${body}</table>`;
+        };
+        
+        renderer.tablerow = function(content) {
+            return `<tr class="markdown-table-row">${content}</tr>`;
+        };
+        
+        renderer.tablecell = function(content, flags) {
+            const type = flags.header ? 'th' : 'td';
+            const className = flags.header ? 'markdown-table-header' : 'markdown-table-cell';
+            return `<${type} class="${className}">${content}</${type}>`;
+        };
+        
+        marked.setOptions({ renderer: renderer });
+
+        function showMarkdownDemo() {
+            const welcomeSection = document.getElementById('welcomeSection');
+            const markdownDemo = document.getElementById('markdownDemo');
+            
+            welcomeSection.classList.add('hide');
+            markdownDemo.style.display = 'block';
+            
+            // Beautiful markdown content
+            const markdownContent = `# 🎨 Markdown Hermoso
+
+¡Bienvenido a la demostración de **Markdown renderizado con estilo**! Aquí puedes ver cómo se ve el texto cuando se interpreta correctamente desde el frontend.
+
+## ✨ Características Principales
+
+### **Tipografía Mejorada**
+- **Títulos** con jerarquía visual clara
+- *Texto en cursiva* y **negrita** bien diferenciados
+- \`Código inline\` con fondo y bordes sutiles
+- Enlaces con [efectos hover](https://example.com) elegantes
+
+### **Elementos Estructurales**
+
+#### Listas Organizadas
+1. **Elemento numerado** con estilo
+2. **Segundo elemento** con formato
+3. **Tercer elemento** con consistencia
+
+- Elemento con viñeta
+- Otro elemento importante
+- Último elemento de la lista
+
+#### Citas y Referencias
+> Esta es una cita elegante con fondo azul sutil y borde izquierdo distintivo. 
+> Las comillas decorativas le dan un toque especial al diseño.
+
+### **Código y Sintaxis**
+
+Aquí tienes un ejemplo de código JavaScript:
+
+\`\`\`javascript
+function renderMarkdown(content) {
+    if (typeof marked !== 'undefined') {
+        try {
+            let html = marked.parse(content);
+            return html;
+        } catch (error) {
+            console.error('Error rendering markdown:', error);
+            return content;
+        }
+    }
+    return content;
+}
+\`\`\`
+
+Y también código Python:
+
+\`\`\`python
+def process_text(text):
+    """Procesa el texto con Markdown"""
+    import markdown
+    return markdown.markdown(text, extensions=['codehilite'])
+\`\`\`
+
+### **Tablas Organizadas**
+
+| Característica | Descripción | Estado |
+|----------------|-------------|---------|
+| **Títulos** | Jerarquía visual clara | ✅ Implementado |
+| **Listas** | Estilo consistente | ✅ Implementado |
+| **Código** | Syntax highlighting | ✅ Implementado |
+| **Tablas** | Diseño responsivo | ✅ Implementado |
+| **Enlaces** | Efectos hover | ✅ Implementado |
+
+### **Elementos Especiales**
+
+---
+
+#### Texto con Formato Avanzado
+- **Negrita** para énfasis
+- *Cursiva* para estilo
+- ~~Tachado~~ para correcciones
+- ==Resaltado== para importancia
+- \`Código inline\` para referencias técnicas
+
+#### Enlaces Útiles
+- [Documentación de Markdown](https://daringfireball.net/projects/markdown/)
+- [GitHub Flavored Markdown](https://github.github.com/gfm/)
+- [Marked.js Documentation](https://marked.js.org/)
+
+---
+
+## 🚀 Resultado Final
+
+El Markdown ahora se renderiza con:
+- **Tipografía hermosa** y legible
+- **Colores consistentes** con el tema oscuro
+- **Espaciado perfecto** entre elementos
+- **Efectos visuales** sutiles pero elegantes
+- **Responsive design** para todos los dispositivos
+
+¡El texto se ve **profesional** y **hermoso**! 🎉`;
+
+            // Render the markdown
+            const renderedHTML = marked.parse(markdownContent);
+            document.getElementById('markdownContent').innerHTML = renderedHTML;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Auto-show demo after a short delay
+            setTimeout(() => {
+                showMarkdownDemo();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
