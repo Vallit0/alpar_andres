@@ -14,13 +14,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔥 CREDENCIALES HARDCODEADAS - EDITA ESTOS VALORES
+// 🔥 CREDENCIALES HARDCODEADAS - CONFIGURACIÓN DEL PORTAL AZURE
 const AZURE_CONFIG = {
-  CLIENT_ID: 'your_client_id_here',
-  CLIENT_SECRET: 'your_client_secret_here', 
-  TENANT_ID: 'your_tenant_id_here',
-  PROJECT_URL: 'https://your-resource.services.ai.azure.com/api/projects/your-project',
-  AGENT_ID: 'asst_your_agent_id_here'
+  PROJECT_URL: 'https://senorialesbot-resource.services.ai.azure.com/api/projects/senorialesbot',
+  AGENT_ID: 'asst_T2Ng0OAbJRfXNvzATw7jINtd'
 };
 
 // Initialize Azure AI Projects client
@@ -29,17 +26,7 @@ let agent;
 
 async function initializeAzureClient() {
   try {
-    // Verificar que las credenciales estén configuradas
-    if (AZURE_CONFIG.CLIENT_ID === 'your_client_id_here') {
-      console.log('⚠️ Credenciales no configuradas, ejecutando en modo demo');
-      return;
-    }
-
-    // Configurar las credenciales de Azure
-    process.env.AZURE_CLIENT_ID = AZURE_CONFIG.CLIENT_ID;
-    process.env.AZURE_CLIENT_SECRET = AZURE_CONFIG.CLIENT_SECRET;
-    process.env.AZURE_TENANT_ID = AZURE_CONFIG.TENANT_ID;
-
+    // Usar DefaultAzureCredential (funciona con Azure CLI, Managed Identity, etc.)
     projectClient = new AIProjectClient(
       AZURE_CONFIG.PROJECT_URL,
       new DefaultAzureCredential()
@@ -68,7 +55,7 @@ Actualmente estoy funcionando en modo de demostración ya que los servicios de A
 - Ayudarte con información básica
 - Mostrarte las capacidades de la interfaz
 
-Para habilitar las funcionalidades completas de IA, configura las credenciales en el archivo server-hardcoded.js`,
+Para habilitar las funcionalidades completas de IA, configura las credenciales de Azure.`,
 
     `¡Perfecto! Entiendo que quieres: "${userMessage}".
 
@@ -87,7 +74,7 @@ Configura las credenciales de Azure AI Projects en el código.`,
 
 **🤖 Estado actual:** Modo demostración
 **🎯 Capacidades:** Interfaz completa + respuestas básicas
-**🚀 Próximo paso:** Configurar credenciales de Azure
+**🚀 Próximo paso:** Configurar autenticación de Azure
 
 ¿Hay algo específico en lo que pueda ayudarte mientras tanto?`
   ];
