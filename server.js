@@ -20,12 +20,17 @@ let agent;
 
 async function initializeAzureClient() {
   try {
+    // Hardcoded Azure credentials
+    const AZURE_PROJECT_URL = "https://senorialesbot-resource.services.ai.azure.com/api/projects/senorialesbot";
+    const AZURE_AGENT_ID = "asst_T2Ng0OAbJRfXNvzATw7jINtd";
+    
+    
     projectClient = new AIProjectClient(
-      process.env.AZURE_PROJECT_URL,
+      AZURE_PROJECT_URL,
       new DefaultAzureCredential()
     );
     
-    agent = await projectClient.agents.getAgent(process.env.AZURE_AGENT_ID);
+    agent = await projectClient.agents.getAgent(AZURE_AGENT_ID);
     console.log(`✅ Azure AI Projects initialized. Agent: ${agent.name}`);
   } catch (error) {
     console.error('❌ Error initializing Azure AI Projects:', error);

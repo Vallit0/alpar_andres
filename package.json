@@ -4,8 +4,8 @@
   "description": "Chatbot basado en Azure AI Projects para GitHub Pages",
   "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node server-hardcoded.js",
+    "dev": "nodemon server-hardcoded.js",
     "build": "echo 'Build completed - Static files ready'",
     "deploy": "gh-pages -d public",
     "azure:deploy": "echo 'Deploying to Azure Static Web Apps'"
