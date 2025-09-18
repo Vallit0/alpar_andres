@@ -986,8 +986,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize podcast functionality
     initializePodcasts();
     
-    // Initialize D-ID agent sizing
-    initializeDIDAgent();
+    // Initialize D-ID agent management
+    initializeDIDAgentManagement();
 });
 
 // Floating Particles for Event Atmosphere
@@ -1097,50 +1097,49 @@ function initializePodcasts() {
 let didAgentLoaded = false;
 let didAgentScript = null;
 
-function loadDIDAgent() {
-    if (didAgentLoaded) return;
+function initializeDIDAgent() {
+    console.log('Initializing D-ID Agent...');
+    console.log('Environment:', window.location.hostname);
+    console.log('Protocol:', window.location.protocol);
     
-    console.log('Loading D-ID Agent...');
-    
-    // Create script element
-    didAgentScript = document.createElement('script');
-    didAgentScript.type = 'module';
-    didAgentScript.src = 'https://agent.d-id.com/v2/index.js';
-    didAgentScript.setAttribute('data-mode', 'full');
-    didAgentScript.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo');
-    didAgentScript.setAttribute('data-agent-id', 'v2_agt_VZZkEv_g');
-    didAgentScript.setAttribute('data-name', 'did-agent');
-    didAgentScript.setAttribute('data-monitor', 'true');
-    didAgentScript.setAttribute('data-target-id', 'did-agent-container');
-    
-    // Add to agent container
-    const agentContainer = document.getElementById('did-agent-container');
-    if (agentContainer) {
-        agentContainer.appendChild(didAgentScript);
-        didAgentLoaded = true;
-        
-        // Wait for agent to load and apply styling
-        setTimeout(() => {
-            const agentElement = document.querySelector('[data-name="did-agent"]');
-            if (agentElement) {
-                applyAgentStyling(agentElement);
-            }
-        }, 2000);
-    }
-}
-
-function unloadDIDAgent() {
-    if (didAgentScript && didAgentScript.parentNode) {
-        didAgentScript.parentNode.removeChild(didAgentScript);
-        didAgentLoaded = false;
-        didAgentScript = null;
+    // Check if the script element exists
+    const scriptElement = document.querySelector('script[data-name="did-agent"]');
+    if (scriptElement) {
+        console.log('D-ID script element found:', scriptElement);
+        console.log('Script src:', scriptElement.src);
+        console.log('Script attributes:', {
+            mode: scriptElement.getAttribute('data-mode'),
+            clientKey: scriptElement.getAttribute('data-client-key'),
+            agentId: scriptElement.getAttribute('data-agent-id'),
+            targetId: scriptElement.getAttribute('data-target-id')
+        });
+    } else {
+        console.error('D-ID script element not found');
     }
     
-    // Clear the container
-    const agentContainer = document.getElementById('did-agent-container');
-    if (agentContainer) {
-        agentContainer.innerHTML = '';
-    }
+    // Wait for agent to load and apply styling
+    setTimeout(() => {
+        const agentElement = document.querySelector('[data-name="did-agent"]');
+        if (agentElement) {
+            applyAgentStyling(agentElement);
+            didAgentLoaded = true;
+            console.log('D-ID Agent loaded successfully');
+        } else {
+            console.log('D-ID Agent not found, retrying...');
+            // Retry after 3 seconds
+            setTimeout(() => {
+                const agentElement = document.querySelector('[data-name="did-agent"]');
+                if (agentElement) {
+                    applyAgentStyling(agentElement);
+                    didAgentLoaded = true;
+                    console.log('D-ID Agent loaded on retry');
+                } else {
+                    console.error('D-ID Agent failed to load after retry');
+                    console.log('Available elements with data-name:', document.querySelectorAll('[data-name]'));
+                }
+            }, 3000);
+        }
+    }, 2000);
 }
 
 function applyAgentStyling(agentElement) {
@@ -1190,19 +1189,37 @@ function applyAgentStyling(agentElement) {
 }
 
 // Initialize D-ID Agent management
-function initializeDIDAgent() {
-    // Override the switchTab method to handle agent loading/unloading
+function initializeDIDAgentManagement() {
+    // Add error listeners for debugging
+    window.addEventListener('error', (event) => {
+        if (event.filename && event.filename.includes('agent.d-id.com')) {
+            console.error('D-ID Agent script error:', event);
+        }
+    });
+    
+    window.addEventListener('unhandledrejection', (event) => {
+        if (event.reason && event.reason.toString().includes('d-id')) {
+            console.error('D-ID Agent promise rejection:', event.reason);
+        }
+    });
+    
+    // Initialize the agent once when the page loads
+    initializeDIDAgent();
+    
+    // Override the switchTab method to handle agent visibility
     const originalSwitchTab = window.alparBot?.switchTab;
     if (originalSwitchTab) {
         window.alparBot.switchTab = function(tabName) {
             originalSwitchTab.call(this, tabName);
             
             if (tabName === 'agent') {
-                // Load agent when switching to agent tab
-                loadDIDAgent();
-            } else {
-                // Unload agent when switching away from agent tab
-                unloadDIDAgent();
+                // Apply styling when switching to agent tab
+                setTimeout(() => {
+                    const agentElement = document.querySelector('[data-name="did-agent"]');
+                    if (agentElement) {
+                        applyAgentStyling(agentElement);
+                    }
+                }, 100);
             }
         };
     }

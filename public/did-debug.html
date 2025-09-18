@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>D-ID Agent Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #151517;
+            color: white;
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #333;
+            border-radius: 8px;
+        }
+        .success { border-color: #4CAF50; }
+        .error { border-color: #f44336; }
+        .warning { border-color: #ff9800; }
+        pre {
+            background: #222;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>D-ID Agent Debug Information</h1>
+    
+    <div class="debug-section" id="environment">
+        <h2>Environment Information</h2>
+        <div id="env-details"></div>
+    </div>
+    
+    <div class="debug-section" id="network">
+        <h2>Network Status</h2>
+        <div id="network-details"></div>
+    </div>
+    
+    <div class="debug-section" id="script">
+        <h2>Script Element</h2>
+        <div id="script-details"></div>
+    </div>
+    
+    <div class="debug-section" id="agent">
+        <h2>Agent Element</h2>
+        <div id="agent-details"></div>
+    </div>
+    
+    <div class="debug-section" id="errors">
+        <h2>Errors</h2>
+        <div id="error-details"></div>
+    </div>
+
+    <!-- D-ID Agent Test -->
+    <div class="debug-section">
+        <h2>D-ID Agent Test</h2>
+        <div id="did-agent-container" style="width: 100%; height: 400px; border: 2px solid #333; border-radius: 8px;">
+            <script type="module"
+                src="https://agent.d-id.com/v2/index.js"
+                data-mode="full"
+                data-client-key="Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo"
+                data-agent-id="v2_agt_VZZkEv_g"
+                data-name="did-agent"
+                data-monitor="true"
+                data-target-id="did-agent-container">
+            </script>
+        </div>
+    </div>
+
+    <script>
+        // Debug information collection
+        function collectDebugInfo() {
+            // Environment
+            const envInfo = {
+                hostname: window.location.hostname,
+                protocol: window.location.protocol,
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                online: navigator.onLine,
+                cookieEnabled: navigator.cookieEnabled
+            };
+            
+            document.getElementById('env-details').innerHTML = `
+                <pre>${JSON.stringify(envInfo, null, 2)}</pre>
+            `;
+            
+            // Network test
+            fetch('https://agent.d-id.com/v2/index.js', { method: 'HEAD' })
+                .then(response => {
+                    document.getElementById('network-details').innerHTML = `
+                        <div class="success">✅ D-ID CDN accessible</div>
+                        <pre>Status: ${response.status}
+Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}</pre>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('network-details').innerHTML = `
+                        <div class="error">❌ D-ID CDN not accessible</div>
+                        <pre>Error: ${error.message}</pre>
+                    `;
+                });
+            
+            // Script element
+            const scriptElement = document.querySelector('script[data-name="did-agent"]');
+            if (scriptElement) {
+                document.getElementById('script-details').innerHTML = `
+                    <div class="success">✅ Script element found</div>
+                    <pre>${JSON.stringify({
+                        src: scriptElement.src,
+                        type: scriptElement.type,
+                        attributes: {
+                            mode: scriptElement.getAttribute('data-mode'),
+                            clientKey: scriptElement.getAttribute('data-client-key'),
+                            agentId: scriptElement.getAttribute('data-agent-id'),
+                            targetId: scriptElement.getAttribute('data-target-id')
+                        }
+                    }, null, 2)}</pre>
+                `;
+            } else {
+                document.getElementById('script-details').innerHTML = `
+                    <div class="error">❌ Script element not found</div>
+                `;
+            }
+            
+            // Agent element (check after delay)
+            setTimeout(() => {
+                const agentElement = document.querySelector('[data-name="did-agent"]');
+                if (agentElement) {
+                    document.getElementById('agent-details').innerHTML = `
+                        <div class="success">✅ Agent element found</div>
+                        <pre>Element: ${agentElement.outerHTML.substring(0, 200)}...</pre>
+                    `;
+                } else {
+                    document.getElementById('agent-details').innerHTML = `
+                        <div class="warning">⚠️ Agent element not found yet</div>
+                    `;
+                }
+            }, 3000);
+        }
+        
+        // Error collection
+        window.addEventListener('error', (event) => {
+            const errorDiv = document.getElementById('error-details');
+            errorDiv.innerHTML += `
+                <div class="error">
+                    <strong>Error:</strong> ${event.message}<br>
+                    <strong>File:</strong> ${event.filename}<br>
+                    <strong>Line:</strong> ${event.lineno}<br>
+                    <pre>${event.error?.stack || 'No stack trace'}</pre>
+                </div>
+            `;
+        });
+        
+        window.addEventListener('unhandledrejection', (event) => {
+            const errorDiv = document.getElementById('error-details');
+            errorDiv.innerHTML += `
+                <div class="error">
+                    <strong>Promise Rejection:</strong> ${event.reason}<br>
+                    <pre>${event.reason?.stack || 'No stack trace'}</pre>
+                </div>
+            `;
+        });
+        
+        // Initialize debug info
+        document.addEventListener('DOMContentLoaded', collectDebugInfo);
+    </script>
+</body>
+</html>
