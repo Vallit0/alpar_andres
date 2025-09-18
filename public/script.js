@@ -1180,6 +1180,24 @@ function initializeDIDAgent() {
     console.log('Environment:', window.location.hostname);
     console.log('Protocol:', window.location.protocol);
     
+    // Show loading state
+    const agentContainer = document.getElementById('did-agent-container');
+    if (agentContainer) {
+        agentContainer.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #fff; text-align: center; padding: 20px;">
+                <div style="width: 50px; height: 50px; border: 3px solid #333; border-top: 3px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+                <h3>Inicializando Sofia...</h3>
+                <p>Configurando acceso a cámara y micrófono</p>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                </style>
+            </div>
+        `;
+    }
+    
     // Check if the script element exists
     const scriptElement = document.querySelector('script[data-name="did-agent"]');
     if (scriptElement) {
@@ -1189,10 +1207,21 @@ function initializeDIDAgent() {
             mode: scriptElement.getAttribute('data-mode'),
             clientKey: scriptElement.getAttribute('data-client-key'),
             agentId: scriptElement.getAttribute('data-agent-id'),
-            targetId: scriptElement.getAttribute('data-target-id')
+            targetId: scriptElement.getAttribute('data-target-id'),
+            orientation: scriptElement.getAttribute('data-orientation'),
+            position: scriptElement.getAttribute('data-position')
         });
     } else {
         console.error('D-ID script element not found');
+        if (agentContainer) {
+            agentContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ff6b6b; text-align: center; padding: 20px;">
+                    <h3>❌ Error de Configuración</h3>
+                    <p>No se encontró el script de D-ID</p>
+                </div>
+            `;
+        }
+        return;
     }
     
     // Configure getUserMedia first
@@ -1207,6 +1236,26 @@ function initializeDIDAgent() {
                     applyAgentStyling(agentElement);
                     didAgentLoaded = true;
                     console.log('D-ID Agent loaded successfully');
+                    
+                    // Show success message briefly
+                    const agentContainer = document.getElementById('did-agent-container');
+                    if (agentContainer) {
+                        const successDiv = document.createElement('div');
+                        successDiv.style.cssText = `
+                            position: absolute; top: 20px; right: 20px; z-index: 1002;
+                            background: #4CAF50; color: white; padding: 10px 15px;
+                            border-radius: 5px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                        `;
+                        successDiv.innerHTML = '✅ Sofia está lista para hablar contigo';
+                        agentContainer.appendChild(successDiv);
+                        
+                        // Remove success message after 3 seconds
+                        setTimeout(() => {
+                            if (successDiv.parentNode) {
+                                successDiv.parentNode.removeChild(successDiv);
+                            }
+                        }, 3000);
+                    }
                 } else {
                     console.log('D-ID Agent not found, retrying...');
                     // Retry after 3 seconds
@@ -1230,13 +1279,44 @@ function initializeDIDAgent() {
             // Show user-friendly error message
             const agentContainer = document.getElementById('did-agent-container');
             if (agentContainer) {
+                let errorIcon = '⚠️';
+                let errorTitle = 'Acceso a Cámara/Micrófono Requerido';
+                let errorMessage = error.message;
+                let showReloadButton = true;
+                
+                // Customize error message based on error type
+                if (error.message.includes('denegados')) {
+                    errorIcon = '🚫';
+                    errorTitle = 'Permisos Denegados';
+                    errorMessage = 'Por favor, permite el acceso a la cámara y micrófono en tu navegador y recarga la página.';
+                } else if (error.message.includes('HTTPS')) {
+                    errorIcon = '🔒';
+                    errorTitle = 'Conexión Segura Requerida';
+                    errorMessage = 'Sofia requiere una conexión HTTPS para funcionar correctamente.';
+                } else if (error.message.includes('dispositivos')) {
+                    errorIcon = '📷';
+                    errorTitle = 'Dispositivos No Encontrados';
+                    errorMessage = 'No se encontraron cámara o micrófono en tu dispositivo.';
+                }
+                
                 agentContainer.innerHTML = `
-                    <div style="padding: 20px; text-align: center; color: #ff6b6b;">
-                        <h3>⚠️ Acceso a Cámara/Micrófono Requerido</h3>
-                        <p>${error.message}</p>
-                        <button onclick="location.reload()" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                            Recargar Página
-                        </button>
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ff6b6b; text-align: center; padding: 20px;">
+                        <div style="font-size: 48px; margin-bottom: 20px;">${errorIcon}</div>
+                        <h3>${errorTitle}</h3>
+                        <p style="margin: 20px 0; color: #ccc;">${errorMessage}</p>
+                        ${showReloadButton ? `
+                            <button onclick="location.reload()" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                                🔄 Recargar Página
+                            </button>
+                        ` : ''}
+                        <div style="margin-top: 20px; font-size: 12px; color: #666;">
+                            <p>Si el problema persiste, verifica que:</p>
+                            <ul style="text-align: left; margin: 10px 0;">
+                                <li>Tu navegador soporte getUserMedia</li>
+                                <li>La página se carga sobre HTTPS</li>
+                                <li>No hay otras aplicaciones usando la cámara</li>
+                            </ul>
+                        </div>
                     </div>
                 `;
             }
@@ -1317,7 +1397,10 @@ function initializeDIDAgentManagement() {
     });
     
     // Initialize the agent once when the page loads
-    initializeDIDAgent();
+    // Wait a bit for the DOM to be fully ready
+    setTimeout(() => {
+        initializeDIDAgent();
+    }, 1000);
     
     // Override the switchTab method to handle agent visibility
     const originalSwitchTab = window.alparBot?.switchTab;
