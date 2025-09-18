@@ -808,9 +808,8 @@ class AlparBot {
         if (tabName === 'home') {
             this.homeTab.classList.add('active');
             this.homeContent.classList.add('active');
-            // Show fabio agent only on homepage
+            // Set homepage as active
             document.body.classList.add('homepage-active');
-            this.showFabioAgent();
             // Refresh scroll animations for homepage
             if (window.scrollAnimations) {
                 setTimeout(() => {
@@ -820,17 +819,15 @@ class AlparBot {
         } else if (tabName === 'chat') {
             this.chatTab.classList.add('active');
             this.chatContent.classList.add('active');
-            // Hide fabio agent when not on homepage
+            // Remove homepage class
             document.body.classList.remove('homepage-active');
-            this.hideFabioAgent();
             // Focus input when switching to chat
             setTimeout(() => this.messageInput.focus(), 100);
         } else if (tabName === 'agent') {
             this.agentTab.classList.add('active');
             this.agentContent.classList.add('active');
-            // Hide fabio agent when not on homepage
+            // Remove homepage class
             document.body.classList.remove('homepage-active');
-            this.hideFabioAgent();
         }
         
         console.log(`Switched to ${tabName} tab`);
@@ -895,42 +892,6 @@ class AlparBot {
         }, 500);
     }
 
-    // Fabio Agent visibility control
-    showFabioAgent() {
-        const fabioScript = document.getElementById('fabio-agent-script');
-        if (fabioScript) {
-            fabioScript.style.display = 'block';
-            // Try to reinitialize the agent if it exists
-            if (window.didAgent) {
-                try {
-                    window.didAgent.show();
-                } catch (e) {
-                    console.log('Fabio agent not yet initialized');
-                }
-            }
-        }
-    }
-
-    hideFabioAgent() {
-        const fabioScript = document.getElementById('fabio-agent-script');
-        if (fabioScript) {
-            fabioScript.style.display = 'none';
-            // Try to hide the agent if it exists
-            if (window.didAgent) {
-                try {
-                    window.didAgent.hide();
-                } catch (e) {
-                    console.log('Fabio agent not yet initialized');
-                }
-            }
-        }
-        
-        // Also hide any existing fabio agent elements
-        const fabioElements = document.querySelectorAll('[data-name="did-agent"]');
-        fabioElements.forEach(element => {
-            element.style.display = 'none';
-        });
-    }
 }
 
 // Initialize the chatbot when the page loads

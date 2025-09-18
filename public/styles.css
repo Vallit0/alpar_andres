@@ -2013,22 +2013,7 @@ body.homepage-active .bottom-input-bar {
     font-style: italic;
 }
 
-/* Fabio Agent Control */
-#fabio-agent-script {
-    display: block;
-}
 
-/* Hide fabio agent when not on homepage */
-.tab-content:not(.active) #fabio-agent-script,
-.tab-content[data-tab="chat"] #fabio-agent-script,
-.tab-content[data-tab="agent"] #fabio-agent-script {
-    display: none !important;
-}
-
-/* Hide fabio agent elements when not on homepage */
-body:not(.homepage-active) [data-name="did-agent"] {
-    display: none !important;
-}
 
 /* Agent Section Styles */
 .agent-section {
