@@ -830,7 +830,10 @@ class AlparBot {
             document.body.classList.remove('homepage-active');
         }
         
+        // Debug: Check which tabs are active
         console.log(`Switched to ${tabName} tab`);
+        console.log('Active tabs:', document.querySelectorAll('.tab-content.active').length);
+        console.log('Agent content active:', this.agentContent.classList.contains('active'));
     }
 
     // Homepage chat functionality
@@ -977,6 +980,9 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize podcast functionality
     initializePodcasts();
+    
+    // Initialize D-ID agent sizing
+    initializeDIDAgent();
 });
 
 // Floating Particles for Event Atmosphere
@@ -1080,4 +1086,119 @@ function initializePodcasts() {
             }
         });
     });
+}
+
+// D-ID Agent Management
+let didAgentLoaded = false;
+let didAgentScript = null;
+
+function loadDIDAgent() {
+    if (didAgentLoaded) return;
+    
+    console.log('Loading D-ID Agent...');
+    
+    // Create script element
+    didAgentScript = document.createElement('script');
+    didAgentScript.type = 'module';
+    didAgentScript.src = 'https://agent.d-id.com/v2/index.js';
+    didAgentScript.setAttribute('data-mode', 'full');
+    didAgentScript.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo');
+    didAgentScript.setAttribute('data-agent-id', 'v2_agt_VZZkEv_g');
+    didAgentScript.setAttribute('data-name', 'did-agent');
+    didAgentScript.setAttribute('data-monitor', 'true');
+    didAgentScript.setAttribute('data-target-id', 'did-agent-container');
+    
+    // Add to agent container
+    const agentContainer = document.getElementById('did-agent-container');
+    if (agentContainer) {
+        agentContainer.appendChild(didAgentScript);
+        didAgentLoaded = true;
+        
+        // Wait for agent to load and apply styling
+        setTimeout(() => {
+            const agentElement = document.querySelector('[data-name="did-agent"]');
+            if (agentElement) {
+                applyAgentStyling(agentElement);
+            }
+        }, 2000);
+    }
+}
+
+function unloadDIDAgent() {
+    if (didAgentScript && didAgentScript.parentNode) {
+        didAgentScript.parentNode.removeChild(didAgentScript);
+        didAgentLoaded = false;
+        didAgentScript = null;
+    }
+    
+    // Clear the container
+    const agentContainer = document.getElementById('did-agent-container');
+    if (agentContainer) {
+        agentContainer.innerHTML = '';
+    }
+}
+
+function applyAgentStyling(agentElement) {
+    console.log('Applying D-ID Agent styling...');
+    
+    // Hide the intro section and show the agent
+    const agentContent = document.getElementById('agentContent');
+    agentContent.classList.add('agent-loaded');
+    
+    // Force full screen sizing
+    agentElement.style.width = '100%';
+    agentElement.style.height = '100vh';
+    agentElement.style.minHeight = '100vh';
+    agentElement.style.maxWidth = '100%';
+    agentElement.style.margin = '0';
+    agentElement.style.padding = '0';
+    agentElement.style.borderRadius = '0';
+    agentElement.style.overflow = 'hidden';
+    agentElement.style.display = 'block';
+    agentElement.style.position = 'absolute';
+    agentElement.style.top = '0';
+    agentElement.style.left = '0';
+    agentElement.style.right = '0';
+    agentElement.style.bottom = '0';
+    agentElement.style.zIndex = '1000';
+    agentElement.style.background = '#151517';
+    
+    // Force sizing on any iframes
+    const iframes = agentElement.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+        iframe.style.width = '100%';
+        iframe.style.height = '100vh';
+        iframe.style.minHeight = '100vh';
+        iframe.style.border = 'none';
+        iframe.style.borderRadius = '0';
+    });
+    
+    // Force sizing on any child divs
+    const childDivs = agentElement.querySelectorAll('div');
+    childDivs.forEach(div => {
+        div.style.width = '100%';
+        div.style.height = '100vh';
+        div.style.minHeight = '100vh';
+    });
+    
+    console.log('D-ID Agent styling applied');
+}
+
+// Initialize D-ID Agent management
+function initializeDIDAgent() {
+    // Override the switchTab method to handle agent loading/unloading
+    const originalSwitchTab = window.alparBot?.switchTab;
+    if (originalSwitchTab) {
+        window.alparBot.switchTab = function(tabName) {
+            originalSwitchTab.call(this, tabName);
+            
+            if (tabName === 'agent') {
+                // Load agent when switching to agent tab
+                loadDIDAgent();
+            } else {
+                // Unload agent when switching away from agent tab
+                unloadDIDAgent();
+            }
+        };
+    }
 }
