@@ -1,6 +1,9 @@
 # Use Node.js 20 LTS as base image
 FROM node:20-alpine
 
+# Install curl for health checks and debugging
+RUN apk add --no-cache curl
+
 # Set working directory
 WORKDIR /app
 
@@ -13,6 +16,10 @@ RUN npm ci --only=production
 # Copy application code
 COPY . .
 
+# Copy and setup entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 # Create non-root user for security
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S alparbot -u 1001
@@ -24,9 +31,10 @@ USER alparbot
 # Expose port
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+# Health check with external API connectivity test
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:5000/api/health || exit 1
 
-# Start the application
-CMD ["npm", "start"]
+# Use entrypoint script for better external API handling
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["node", "server-hardcoded.js"]

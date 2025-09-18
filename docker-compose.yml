@@ -8,13 +8,15 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=5000
-      # Azure AI Projects credentials (set these in your environment or .env file)
-      - AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
-      - AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
-      - AZURE_TENANT_ID=${AZURE_TENANT_ID}
-      - AZURE_PROJECT_URL=${AZURE_PROJECT_URL}
-      - AZURE_AGENT_ID=${AZURE_AGENT_ID}
+      # Azure credentials are hardcoded in server-hardcoded.js
+      # Add external API timeout settings
+      - AZURE_API_TIMEOUT=30000
+      - EXTERNAL_API_RETRY_ATTEMPTS=3
     restart: unless-stopped
+    # Add network configuration for external API access
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s

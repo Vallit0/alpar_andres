@@ -19,6 +19,12 @@ class AlparBot {
         this.menuButton = document.getElementById('menuButton');
         this.addButton = document.getElementById('addButton');
         this.attachButton = document.getElementById('attachButton');
+        
+        // Tab elements
+        this.chatTab = document.getElementById('chatTab');
+        this.agentTab = document.getElementById('agentTab');
+        this.chatContent = document.getElementById('chatContent');
+        this.agentContent = document.getElementById('agentContent');
     }
 
     setupEventListeners() {
@@ -55,6 +61,10 @@ class AlparBot {
             console.log('Attach clicked');
             // TODO: Implement file attachment
         });
+
+        // Tab functionality
+        this.chatTab.addEventListener('click', () => this.switchTab('chat'));
+        this.agentTab.addEventListener('click', () => this.switchTab('agent'));
 
         // Focus input on load
         this.messageInput.focus();
@@ -768,6 +778,26 @@ class AlparBot {
         this.isFirstMessage = true;
         this.threadId = null;
     }
+
+    // Tab switching functionality
+    switchTab(tabName) {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to selected tab and content
+        if (tabName === 'chat') {
+            this.chatTab.classList.add('active');
+            this.chatContent.classList.add('active');
+            // Focus input when switching to chat
+            setTimeout(() => this.messageInput.focus(), 100);
+        } else if (tabName === 'agent') {
+            this.agentTab.classList.add('active');
+            this.agentContent.classList.add('active');
+        }
+        
+        console.log(`Switched to ${tabName} tab`);
+    }
 }
 
 // Initialize the chatbot when the page loads
@@ -779,6 +809,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('💡 Development commands:');
     console.log('   - alparBot.clearConversation() - Clear chat history');
     console.log('   - alparBot.checkServerHealth() - Check server status');
+    console.log('   - alparBot.switchTab("chat") - Switch to chat tab');
+    console.log('   - alparBot.switchTab("agent") - Switch to agent tab');
 });
 
 // Handle page visibility changes to check server health

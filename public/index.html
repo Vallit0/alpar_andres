@@ -17,6 +17,16 @@
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <!-- D-ID Agent Script -->
+    <script type="module"
+      src="https://agent.d-id.com/v2/index.js"
+      data-mode="full"
+      data-client-key="Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo"
+      data-agent-id="v2_agt_VZZkEv_g"
+      data-name="did-agent"
+      data-monitor="true"
+      data-target-id="agentContent">
+    </script>
 </head>
 <body>
     <!-- Top Bar -->
@@ -29,19 +39,73 @@
         </button>
     </header>
 
+    <!-- Tab Navigation -->
+    <nav class="tab-navigation">
+        <div class="tab-container">
+            <button class="tab-button active" id="chatTab" data-tab="chat">
+                <i class="fas fa-comments"></i>
+                <span>Chat ALPAR</span>
+            </button>
+            <button class="tab-button" id="agentTab" data-tab="agent">
+                <i class="fas fa-robot"></i>
+                <span>Agente D-ID</span>
+            </button>
+        </div>
+    </nav>
+
     <!-- Main Content -->
     <main class="main-content">
-        <!-- Welcome Message (Centered) -->
-        <div class="welcome-section" id="welcomeSection">
-            <div class="welcome-icon">
-                <img src="ALPAR.png" alt="ALPAR Logo" class="alpar-logo">
+        <!-- Chat Tab Content -->
+        <div class="tab-content active" id="chatContent">
+            <!-- Welcome Message (Centered) -->
+            <div class="welcome-section" id="welcomeSection">
+                <div class="welcome-icon">
+                    <img src="ALPAR.png" alt="ALPAR Logo" class="alpar-logo">
+                </div>
+                <h1 class="welcome-text">¡Hazme una pregunta sobre ALPAR!</h1>
             </div>
-            <h1 class="welcome-text">¡Hazme una pregunta sobre ALPAR!</h1>
+
+            <!-- Chat Messages (Hidden initially) -->
+            <div class="chat-messages" id="chatMessages" style="display: none;">
+                <!-- Messages will be added here dynamically -->
+            </div>
         </div>
 
-        <!-- Chat Messages (Hidden initially) -->
-        <div class="chat-messages" id="chatMessages" style="display: none;">
-            <!-- Messages will be added here dynamically -->
+        <!-- Agent Tab Content -->
+        <div class="tab-content" id="agentContent">
+            <div class="agent-section">
+                <div class="agent-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h1 class="agent-title">Agente D-ID</h1>
+                <p class="agent-description">
+                    Interactúa con nuestro agente virtual inteligente usando tecnología D-ID. 
+                    El agente está disponible en el lado derecho de la pantalla.
+                </p>
+                <div class="agent-features">
+                    <div class="feature-item">
+                        <i class="fas fa-video"></i>
+                        <span>Interacción visual</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-microphone"></i>
+                        <span>Reconocimiento de voz</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-brain"></i>
+                        <span>IA conversacional</span>
+                    </div>
+                </div>
+                <div class="agent-instructions">
+                    <h3>Instrucciones:</h3>
+                    <ul>
+                        <li>El agente aparecerá automáticamente en el lado derecho</li>
+                        <li>Puedes hablar directamente con él</li>
+                        <li>El agente responde en tiempo real</li>
+                        <li>Usa el modo "fabio" para una experiencia optimizada</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </main>
 
