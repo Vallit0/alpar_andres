@@ -1175,31 +1175,27 @@ function configureUserMedia() {
     });
 }
 
-function initializeDIDAgent() {
+async function initializeDIDAgent() {
     console.log('Initializing D-ID Agent...');
     console.log('Environment:', window.location.hostname);
     console.log('Protocol:', window.location.protocol);
     
-    // Show loading state
+    // Show loading state without removing the script element added to the container
     const agentContainer = document.getElementById('did-agent-container');
-    if (agentContainer) {
-        agentContainer.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #fff; text-align: center; padding: 20px;">
-                <div style="width: 50px; height: 50px; border: 3px solid #333; border-top: 3px solid #4CAF50; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
-                <h3>Inicializando Sofia...</h3>
-                <p>Configurando acceso a cámara y micrófono</p>
-                <style>
-                    @keyframes spin {
-                        0% { transform: rotate(0deg); }
-                        100% { transform: rotate(360deg); }
-                    }
-                </style>
-            </div>
-        `;
+    ensureAgentLoader(agentContainer);
+    
+    // Check if the script element exists - try multiple times
+    let scriptElement = document.querySelector('script[data-name="did-agent"]');
+    let attempts = 0;
+    const maxAttempts = 5;
+    
+    while (!scriptElement && attempts < maxAttempts) {
+        console.log(`Attempt ${attempts + 1} to find D-ID script...`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        scriptElement = document.querySelector('script[data-name="did-agent"]');
+        attempts++;
     }
     
-    // Check if the script element exists
-    const scriptElement = document.querySelector('script[data-name="did-agent"]');
     if (scriptElement) {
         console.log('D-ID script element found:', scriptElement);
         console.log('Script src:', scriptElement.src);
@@ -1212,14 +1208,111 @@ function initializeDIDAgent() {
             position: scriptElement.getAttribute('data-position')
         });
     } else {
-        console.error('D-ID script element not found');
+        console.error('D-ID script element not found after', maxAttempts, 'attempts');
+        console.log('Available scripts:', document.querySelectorAll('script'));
+        
+        // Try to load the script dynamically as fallback
+        console.log('Attempting to load D-ID script dynamically...');
+        const dynamicScript = document.createElement('script');
+        dynamicScript.type = 'module';
+        dynamicScript.src = 'https://agent.d-id.com/v2/index.js';
+        dynamicScript.setAttribute('data-mode', 'full');
+        dynamicScript.setAttribute('data-client-key', 'Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo');
+        dynamicScript.setAttribute('data-agent-id', 'v2_agt_VZZkEv_g');
+        dynamicScript.setAttribute('data-name', 'did-agent');
+        dynamicScript.setAttribute('data-monitor', 'true');
+        dynamicScript.setAttribute('data-target-id', 'did-agent-container');
+        dynamicScript.setAttribute('data-orientation', 'vertical');
+        dynamicScript.setAttribute('data-position', 'center');
+        
         if (agentContainer) {
-            agentContainer.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ff6b6b; text-align: center; padding: 20px;">
-                    <h3>❌ Error de Configuración</h3>
-                    <p>No se encontró el script de D-ID</p>
-                </div>
-            `;
+            agentContainer.appendChild(dynamicScript);
+            console.log('Dynamic D-ID script added to container');
+            
+            // Wait for the dynamic script to load
+            setTimeout(() => {
+                const newScriptElement = document.querySelector('script[data-name="did-agent"]');
+                if (newScriptElement) {
+                    console.log('Dynamic D-ID script loaded successfully');
+                    // Continue with the initialization
+                    configureUserMedia()
+                        .then((stream) => {
+                            console.log('Media access granted, proceeding with D-ID Agent initialization');
+                            
+                            // Wait for agent to load and apply styling
+                            setTimeout(() => {
+                                const agentElement = document.querySelector('[data-name="did-agent"]');
+                                if (agentElement) {
+                                    applyAgentStyling(agentElement);
+                                    didAgentLoaded = true;
+                                    console.log('D-ID Agent loaded successfully');
+                                    removeAgentLoader();
+                                    
+                                    // Show success message briefly
+                                    const successDiv = document.createElement('div');
+                                    successDiv.style.cssText = `
+                                        position: absolute; top: 20px; right: 20px; z-index: 1002;
+                                        background: #4CAF50; color: white; padding: 10px 15px;
+                                        border-radius: 5px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                                    `;
+                                    successDiv.innerHTML = '✅ Sofia está lista para hablar contigo';
+                                    agentContainer.appendChild(successDiv);
+                                    
+                                    // Remove success message after 3 seconds
+                                    setTimeout(() => {
+                                        if (successDiv.parentNode) {
+                                            successDiv.parentNode.removeChild(successDiv);
+                                        }
+                                    }, 3000);
+                                } else {
+                                    console.log('D-ID Agent not found, retrying...');
+                                    // Retry after 3 seconds
+                                    setTimeout(() => {
+                                        const agentElement = document.querySelector('[data-name="did-agent"]');
+                                if (agentElement) {
+                                    applyAgentStyling(agentElement);
+                                    didAgentLoaded = true;
+                                    console.log('D-ID Agent loaded on retry');
+                                    removeAgentLoader();
+                                } else {
+                                    console.error('D-ID Agent failed to load after retry');
+                                            console.log('Available elements with data-name:', document.querySelectorAll('[data-name]'));
+                                        }
+                                    }, 3000);
+                                }
+                            }, 2000);
+                        })
+                        .catch((error) => {
+                            console.error('Failed to get media access:', error);
+                            
+                            // Show user-friendly error message
+                            removeAgentLoader();
+                            agentContainer.innerHTML = `
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ff6b6b; text-align: center; padding: 20px;">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">⚠️</div>
+                                    <h3>Acceso a Cámara/Micrófono Requerido</h3>
+                                    <p style="margin: 20px 0; color: #ccc;">${error.message}</p>
+                                    <button onclick="location.reload()" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                                        🔄 Recargar Página
+                                    </button>
+                                </div>
+                            `;
+                        });
+                } else {
+                    console.error('Dynamic D-ID script failed to load');
+                    removeAgentLoader();
+                    agentContainer.innerHTML = `
+                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: #ff6b6b; text-align: center; padding: 20px;">
+                            <h3>❌ Error de Configuración</h3>
+                            <p>No se pudo cargar el script de D-ID</p>
+                            <p>Verifica tu conexión a internet y recarga la página</p>
+                            <button onclick="location.reload()" style="padding: 12px 24px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin-top: 10px;">
+                                🔄 Recargar Página
+                            </button>
+                        </div>
+                    `;
+                }
+            }, 3000);
         }
         return;
     }
@@ -1236,6 +1329,7 @@ function initializeDIDAgent() {
                     applyAgentStyling(agentElement);
                     didAgentLoaded = true;
                     console.log('D-ID Agent loaded successfully');
+                    removeAgentLoader();
                     
                     // Show success message briefly
                     const agentContainer = document.getElementById('did-agent-container');
@@ -1265,6 +1359,7 @@ function initializeDIDAgent() {
                             applyAgentStyling(agentElement);
                             didAgentLoaded = true;
                             console.log('D-ID Agent loaded on retry');
+                            removeAgentLoader();
                         } else {
                             console.error('D-ID Agent failed to load after retry');
                             console.log('Available elements with data-name:', document.querySelectorAll('[data-name]'));
@@ -1279,6 +1374,7 @@ function initializeDIDAgent() {
             // Show user-friendly error message
             const agentContainer = document.getElementById('did-agent-container');
             if (agentContainer) {
+                removeAgentLoader();
                 let errorIcon = '⚠️';
                 let errorTitle = 'Acceso a Cámara/Micrófono Requerido';
                 let errorMessage = error.message;
@@ -1321,6 +1417,69 @@ function initializeDIDAgent() {
                 `;
             }
         });
+}
+
+function ensureAgentLoader(agentContainer) {
+    if (!agentContainer) {
+        return null;
+    }
+
+    // Inject loader styles once
+    if (!document.getElementById('did-agent-loader-style')) {
+        const style = document.createElement('style');
+        style.id = 'did-agent-loader-style';
+        style.textContent = `
+            #did-agent-loader {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                padding: 20px;
+                text-align: center;
+                color: #fff;
+                gap: 16px;
+            }
+
+            #did-agent-loader .did-agent-spinner {
+                width: 50px;
+                height: 50px;
+                border: 3px solid #333;
+                border-top: 3px solid #4CAF50;
+                border-radius: 50%;
+                animation: didAgentSpin 1s linear infinite;
+            }
+
+            @keyframes didAgentSpin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    let loader = agentContainer.querySelector('#did-agent-loader');
+    if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'did-agent-loader';
+        loader.innerHTML = `
+            <div class="did-agent-spinner" aria-hidden="true"></div>
+            <h3>Inicializando Sofia...</h3>
+            <p>Configurando acceso a cámara y micrófono</p>
+        `;
+        agentContainer.appendChild(loader);
+    } else {
+        loader.style.display = 'flex';
+    }
+
+    return loader;
+}
+
+function removeAgentLoader() {
+    const loader = document.getElementById('did-agent-loader');
+    if (loader && loader.parentNode) {
+        loader.parentNode.removeChild(loader);
+    }
 }
 
 function applyAgentStyling(agentElement) {
@@ -1398,9 +1557,21 @@ function initializeDIDAgentManagement() {
     
     // Initialize the agent once when the page loads
     // Wait a bit for the DOM to be fully ready
-    setTimeout(() => {
-        initializeDIDAgent();
-    }, 1000);
+    setTimeout(async () => {
+        await initializeDIDAgent();
+    }, 2000);
+    
+    // Also try to initialize when the D-ID script loads
+    window.addEventListener('load', () => {
+        console.log('Window loaded, checking for D-ID script...');
+        setTimeout(async () => {
+            const scriptElement = document.querySelector('script[data-name="did-agent"]');
+            if (scriptElement && !didAgentLoaded) {
+                console.log('D-ID script found on window load, initializing...');
+                await initializeDIDAgent();
+            }
+        }, 1000);
+    });
     
     // Override the switchTab method to handle agent visibility
     const originalSwitchTab = window.alparBot?.switchTab;
