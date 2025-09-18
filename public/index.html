@@ -6,7 +6,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>AlparBot - AI Assistant</title>
+    <title>ALPAR - Asociación Gremial Latinoamericana de Cementerios y Servicios Funerarios</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
@@ -20,16 +20,27 @@
     <!-- Chart.js for data visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
-    <!-- D-ID Agent Script - Fabio Mode for Initial Screen -->
-    <script type="module"
+    <!-- D-ID Agent Script - Fabio Mode for Landing Page Only -->
+    <script type="module" id="fabio-agent-script"
       src="https://agent.d-id.com/v2/index.js"
       data-mode="fabio"
       data-client-key="Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo"
       data-agent-id="v2_agt_VZZkEv_g"
-      data-name="did-agent"
+      data-name="did-agent-fabio"
       data-monitor="true"
       data-orientation="horizontal"
-      data-position="right">
+      data-position="left">
+    </script>
+    
+    <!-- D-ID Agent Script - Full Mode for Agent Tab -->
+    <script type="module"
+      src="https://agent.d-id.com/v2/index.js"
+      data-mode="full"
+      data-client-key="Z29vZ2xlLW9hdXRoMnwxMDk0NjczMjk5NjM1MzczNzg0OTQ6MDdxZk1TS0pjVG95X1NQbTdTTVFo"
+      data-agent-id="v2_agt_VZZkEv_g"
+      data-name="did-agent-full"
+      data-monitor="true"
+      data-target-id="agentContent">
     </script>
 </head>
 <body>
@@ -46,7 +57,11 @@
     <!-- Tab Navigation -->
     <nav class="tab-navigation">
         <div class="tab-container">
-            <button class="tab-button active" id="chatTab" data-tab="chat">
+            <button class="tab-button active" id="homeTab" data-tab="home">
+                <i class="fas fa-home"></i>
+                <span>ALPAR</span>
+            </button>
+            <button class="tab-button" id="chatTab" data-tab="chat">
                 <i class="fas fa-comments"></i>
                 <span>Chat ALPAR</span>
             </button>
@@ -59,14 +74,191 @@
 
     <!-- Main Content -->
     <main class="main-content">
+        <!-- Homepage Tab Content -->
+        <div class="tab-content active" id="homeContent">
+            <div class="homepage-section">
+                <div class="hero-section scroll-animate hero-entrance">
+                    <div class="hero-logo">
+                        <img src="ALPAR.png" alt="ALPAR Logo" class="alpar-logo-large logo-float">
+                    </div>
+                    <h1 class="hero-title text-reveal">ALPAR</h1>
+                    <h2 class="hero-subtitle text-reveal">Asociación Gremial Latinoamericana de Cementerios y Servicios Funerarios</h2>
+                    <p class="hero-description text-reveal">
+                        Somos una asociación que une a personas y entidades vinculadas a la Industria de Cementerios y Funerarias en el ámbito internacional. 
+                        Fomentamos el continuo aprendizaje en un ambiente de sana competencia, espíritu de colaboración y ética profesional.
+                    </p>
+                </div>
+
+                <div class="features-grid scroll-animate scroll-animate-delay-1">
+                    <div class="feature-card card-hover-lift glow-effect">
+                        <div class="feature-icon">
+                            <i class="fas fa-handshake icon-pulse"></i>
+                        </div>
+                        <h3>Patrimonio Funerario</h3>
+                        <p>Promovemos la preservación y valoración del patrimonio cultural funerario, respetando las tradiciones y costumbres de cada región.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-gift"></i>
+                        </div>
+                        <h3>Beneficios</h3>
+                        <p>Ofrecemos múltiples beneficios a nuestros miembros activos, incluyendo capacitaciones, eventos y acceso a recursos especializados.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Reglamentaciones</h3>
+                        <p>Mantenemos actualizadas las normativas y reglamentaciones del sector funerario para garantizar el cumplimiento legal.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Libros Especializados</h3>
+                        <p>Proporcionamos acceso a literatura especializada y recursos educativos para el desarrollo profesional del sector.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3>Código de Ética</h3>
+                        <p>Establecemos y promovemos estándares éticos profesionales que guían las mejores prácticas en la industria funeraria.</p>
+                    </div>
+
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <h3>Alcance Internacional</h3>
+                        <p>Conectamos empresas y profesionales de cementerios y servicios funerarios en toda Latinoamérica y el mundo.</p>
+                    </div>
+                </div>
+
+                <!-- Podcast Section -->
+                <div class="podcast-section scroll-animate scroll-animate-delay-2">
+                    <h2>🎙️ Podcasts ALPAR</h2>
+                    <p>Escucha nuestros últimos podcasts y mantente informado sobre las tendencias y novedades del sector funerario</p>
+                    
+                    <div class="podcast-grid">
+                        <div class="podcast-card card-hover-lift glow-effect">
+                            <div class="podcast-header">
+                                <div class="podcast-icon">
+                                    <i class="fas fa-microphone"></i>
+                                </div>
+                                <div class="podcast-info">
+                                    <h3>Informe 2025</h3>
+                                    <p>Análisis y perspectivas del sector funerario para el próximo año</p>
+                                </div>
+                            </div>
+                            
+                            <div class="podcast-player">
+                                <audio controls preload="metadata">
+                                    <source src="Informe-2025.mp3" type="audio/mpeg">
+                                    Tu navegador no soporta el elemento de audio.
+                                </audio>
+                            </div>
+                            
+                            <div class="podcast-duration">
+                                <span class="duration-badge">5 min</span>
+                                <span>🎧 Escucha ahora</span>
+                            </div>
+                        </div>
+
+                        <div class="podcast-card card-hover-lift glow-effect">
+                            <div class="podcast-header">
+                                <div class="podcast-icon">
+                                    <i class="fas fa-globe-europe"></i>
+                                </div>
+                                <div class="podcast-info">
+                                    <h3>Intercambio España</h3>
+                                    <p>Experiencias y colaboraciones internacionales con España</p>
+                                </div>
+                            </div>
+                            
+                            <div class="podcast-player">
+                                <audio controls preload="metadata">
+                                    <source src="Intercambio-Espana.mp3" type="audio/mpeg">
+                                    Tu navegador no soporta el elemento de audio.
+                                </audio>
+                            </div>
+                            
+                            <div class="podcast-duration">
+                                <span class="duration-badge">5 min</span>
+                                <span>🎧 Escucha ahora</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mission-section scroll-animate scroll-animate-delay-3">
+                    <h2>Misión y Visión</h2>
+                    <div class="mission-vision-content">
+                        <div class="mission-content">
+                            <h3>Misión</h3>
+                            <p>
+                                Somos una asociación que une a personas y entidades vinculadas a la Industria de Cementerios y Funerarias en el ámbito internacional. 
+                                Fomentamos el continuo aprendizaje, enmarcados en un ambiente de sana competencia, espíritu de colaboración y ética profesional, 
+                                promoviendo en nuestros miembros un gran sentido de pertenencia por la Industria y la Asociación.
+                            </p>
+                        </div>
+                        <div class="vision-content">
+                            <h3>Visión</h3>
+                            <p>
+                                ALPAR se proyecta como una asociación líder y con gran reconocimiento en la Industria de Cementerios y Funerarias en el ámbito mundial, 
+                                que busca eliminar las fronteras geográficas existentes entre sus empresas afiliadas y los países en general.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cta-section scroll-animate scroll-animate-delay-4">
+                    <h2>¿Interesado en Conocer Más?</h2>
+                    <p>Conecta con ALPAR y descubre los beneficios de ser parte de nuestra asociación gremial.</p>
+                    
+                    <!-- Chat Input for Homepage -->
+                    <div class="homepage-chat-input">
+                        <h3 class="chat-input-title">💬 ¡Conecta con ALPAR!</h3>
+                        <div class="chat-input-container">
+                            <input 
+                                type="text" 
+                                id="homepageChatInput" 
+                                placeholder="Pregunta sobre membresía, eventos o servicios..."
+                                maxlength="1000"
+                            >
+                            <button class="chat-send-button" id="homepageChatButton">
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                        </div>
+                        <p class="chat-hint">💬 Escribe tu consulta aquí para obtener información sobre ALPAR</p>
+                    </div>
+                    
+                    <div class="cta-buttons">
+                        <button class="cta-button primary glow-effect" onclick="window.alparBot.switchTab('chat')">
+                            <i class="fas fa-comments icon-pulse"></i>
+                            Consultar Información
+                        </button>
+                        <button class="cta-button secondary glow-effect" onclick="window.alparBot.switchTab('agent')">
+                            <i class="fas fa-robot icon-pulse"></i>
+                            Asistente Virtual
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Chat Tab Content -->
-        <div class="tab-content active" id="chatContent">
+        <div class="tab-content" id="chatContent">
             <!-- Welcome Message (Centered) -->
             <div class="welcome-section" id="welcomeSection">
                 <div class="welcome-icon">
                     <img src="ALPAR.png" alt="ALPAR Logo" class="alpar-logo">
                 </div>
-                <h1 class="welcome-text">¡Hazme una pregunta sobre ALPAR!</h1>
+                <h1 class="welcome-text">¡Consulta información sobre ALPAR!</h1>
             </div>
 
             <!-- Chat Messages (Hidden initially) -->
@@ -84,7 +276,7 @@
                 <h1 class="agent-title">Agente D-ID</h1>
                 <p class="agent-description">
                     Interactúa con nuestro agente virtual inteligente usando tecnología D-ID. 
-                    El agente está disponible en el lado derecho de la pantalla.
+                    El agente está disponible en el lado izquierdo de la pantalla.
                 </p>
                 <div class="agent-features">
                     <div class="feature-item">
@@ -103,7 +295,7 @@
                 <div class="agent-instructions">
                     <h3>Instrucciones:</h3>
                     <ul>
-                        <li>El agente aparecerá automáticamente en el lado derecho</li>
+                        <li>El agente aparecerá automáticamente en el lado izquierdo</li>
                         <li>Puedes hablar directamente con él</li>
                         <li>El agente responde en tiempo real</li>
                         <li>Usa el modo "fabio" para una experiencia optimizada</li>

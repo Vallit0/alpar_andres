@@ -21,10 +21,16 @@ class AlparBot {
         this.attachButton = document.getElementById('attachButton');
         
         // Tab elements
+        this.homeTab = document.getElementById('homeTab');
         this.chatTab = document.getElementById('chatTab');
         this.agentTab = document.getElementById('agentTab');
+        this.homeContent = document.getElementById('homeContent');
         this.chatContent = document.getElementById('chatContent');
         this.agentContent = document.getElementById('agentContent');
+        
+        // Homepage chat elements
+        this.homepageChatInput = document.getElementById('homepageChatInput');
+        this.homepageChatButton = document.getElementById('homepageChatButton');
     }
 
     setupEventListeners() {
@@ -63,8 +69,21 @@ class AlparBot {
         });
 
         // Tab functionality
+        this.homeTab.addEventListener('click', () => this.switchTab('home'));
         this.chatTab.addEventListener('click', () => this.switchTab('chat'));
         this.agentTab.addEventListener('click', () => this.switchTab('agent'));
+
+        // Homepage chat functionality
+        if (this.homepageChatInput && this.homepageChatButton) {
+            this.homepageChatInput.addEventListener('input', () => this.onHomepageChatInput());
+            this.homepageChatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.handleHomepageChat();
+                }
+            });
+            this.homepageChatButton.addEventListener('click', () => this.handleHomepageChat());
+        }
 
         // Focus input on load
         this.messageInput.focus();
@@ -786,22 +805,139 @@ class AlparBot {
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         
         // Add active class to selected tab and content
-        if (tabName === 'chat') {
+        if (tabName === 'home') {
+            this.homeTab.classList.add('active');
+            this.homeContent.classList.add('active');
+            // Show fabio agent only on homepage
+            document.body.classList.add('homepage-active');
+            this.showFabioAgent();
+            // Refresh scroll animations for homepage
+            if (window.scrollAnimations) {
+                setTimeout(() => {
+                    window.scrollAnimations.refresh();
+                }, 100);
+            }
+        } else if (tabName === 'chat') {
             this.chatTab.classList.add('active');
             this.chatContent.classList.add('active');
+            // Hide fabio agent when not on homepage
+            document.body.classList.remove('homepage-active');
+            this.hideFabioAgent();
             // Focus input when switching to chat
             setTimeout(() => this.messageInput.focus(), 100);
         } else if (tabName === 'agent') {
             this.agentTab.classList.add('active');
             this.agentContent.classList.add('active');
+            // Hide fabio agent when not on homepage
+            document.body.classList.remove('homepage-active');
+            this.hideFabioAgent();
         }
         
         console.log(`Switched to ${tabName} tab`);
+    }
+
+    // Homepage chat functionality
+    onHomepageChatInput() {
+        const message = this.homepageChatInput.value.trim();
+        if (message.length > 0) {
+            // Add visual feedback that typing will redirect
+            this.homepageChatInput.style.borderColor = 'rgba(0, 122, 255, 0.5)';
+            this.homepageChatButton.style.background = '#0056CC';
+        } else {
+            this.homepageChatInput.style.borderColor = '';
+            this.homepageChatButton.style.background = '';
+        }
+    }
+
+    handleHomepageChat() {
+        const message = this.homepageChatInput.value.trim();
+        
+        if (!message) {
+            return;
+        }
+
+        // Add animation effect before switching
+        this.animateToChat();
+        
+        // Switch to chat tab with animation
+        setTimeout(() => {
+            this.switchTab('chat');
+            // Set the message in the chat input
+            this.messageInput.value = message;
+            // Automatically send the message
+            setTimeout(() => {
+                this.sendMessage();
+            }, 300);
+        }, 500);
+    }
+
+    animateToChat() {
+        // Create a smooth transition animation
+        const homepageContent = this.homeContent;
+        const chatTab = this.chatTab;
+        
+        // Add transition classes
+        homepageContent.style.transition = 'all 0.5s ease-in-out';
+        homepageContent.style.transform = 'translateX(-100%)';
+        homepageContent.style.opacity = '0';
+        
+        // Highlight the chat tab
+        chatTab.style.transform = 'scale(1.1)';
+        chatTab.style.boxShadow = '0 0 20px rgba(0, 122, 255, 0.5)';
+        
+        // Reset styles after animation
+        setTimeout(() => {
+            homepageContent.style.transition = '';
+            homepageContent.style.transform = '';
+            homepageContent.style.opacity = '';
+            chatTab.style.transform = '';
+            chatTab.style.boxShadow = '';
+        }, 500);
+    }
+
+    // Fabio Agent visibility control
+    showFabioAgent() {
+        const fabioScript = document.getElementById('fabio-agent-script');
+        if (fabioScript) {
+            fabioScript.style.display = 'block';
+            // Try to reinitialize the agent if it exists
+            if (window.didAgent) {
+                try {
+                    window.didAgent.show();
+                } catch (e) {
+                    console.log('Fabio agent not yet initialized');
+                }
+            }
+        }
+    }
+
+    hideFabioAgent() {
+        const fabioScript = document.getElementById('fabio-agent-script');
+        if (fabioScript) {
+            fabioScript.style.display = 'none';
+            // Try to hide the agent if it exists
+            if (window.didAgent) {
+                try {
+                    window.didAgent.hide();
+                } catch (e) {
+                    console.log('Fabio agent not yet initialized');
+                }
+            }
+        }
+        
+        // Also hide any existing fabio agent elements
+        const fabioElements = document.querySelectorAll('[data-name="did-agent-fabio"]');
+        fabioElements.forEach(element => {
+            element.style.display = 'none';
+        });
     }
 }
 
 // Initialize the chatbot when the page loads
 document.addEventListener('DOMContentLoaded', () => {
+    // Set homepage as active by default
+    document.body.classList.add('homepage-active');
+    
     window.alparBot = new AlparBot();
     
     // Add some helpful console commands for development
@@ -809,6 +945,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('💡 Development commands:');
     console.log('   - alparBot.clearConversation() - Clear chat history');
     console.log('   - alparBot.checkServerHealth() - Check server status');
+    console.log('   - alparBot.switchTab("home") - Switch to homepage');
     console.log('   - alparBot.switchTab("chat") - Switch to chat tab');
     console.log('   - alparBot.switchTab("agent") - Switch to agent tab');
 });
@@ -832,4 +969,154 @@ function toggleCollapsible(blockId) {
     if (window.alparBot) {
         window.alparBot.toggleCollapsible(blockId);
     }
+}
+
+// Scroll Animation Handler
+class ScrollAnimations {
+    constructor() {
+        this.init();
+    }
+
+    init() {
+        // Create intersection observer for scroll animations
+        this.observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-in');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        // Observe all elements with scroll-animate class
+        this.observeElements();
+    }
+
+    observeElements() {
+        const elements = document.querySelectorAll('.scroll-animate');
+        elements.forEach(element => {
+            this.observer.observe(element);
+        });
+    }
+
+    // Method to re-observe elements when content changes
+    refresh() {
+        this.observeElements();
+    }
+}
+
+// Initialize scroll animations when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.scrollAnimations = new ScrollAnimations();
+    
+    // Initialize floating particles for homepage
+    createFloatingParticles();
+    
+    // Initialize podcast functionality
+    initializePodcasts();
+});
+
+// Floating Particles for Event Atmosphere
+function createFloatingParticles() {
+    const particleContainer = document.createElement('div');
+    particleContainer.className = 'floating-particles';
+    document.body.appendChild(particleContainer);
+    
+    function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        
+        // Random position
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        
+        // Random size
+        const size = Math.random() * 4 + 2;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        
+        particleContainer.appendChild(particle);
+        
+        // Remove particle after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 6000);
+    }
+    
+    // Create particles periodically
+    setInterval(createParticle, 800);
+    
+    // Create initial particles
+    for (let i = 0; i < 5; i++) {
+        setTimeout(createParticle, i * 200);
+    }
+}
+
+// Podcast Functionality
+function initializePodcasts() {
+    const audioElements = document.querySelectorAll('audio');
+    
+    audioElements.forEach(audio => {
+        // Add event listeners for better UX
+        audio.addEventListener('play', function() {
+            // Pause other audio elements when one starts playing
+            audioElements.forEach(otherAudio => {
+                if (otherAudio !== audio && !otherAudio.paused) {
+                    otherAudio.pause();
+                }
+            });
+            
+            // Add visual feedback
+            const card = audio.closest('.podcast-card');
+            if (card) {
+                card.style.borderColor = 'rgba(0, 122, 255, 0.5)';
+                card.style.boxShadow = '0 20px 40px rgba(0, 122, 255, 0.3)';
+            }
+        });
+        
+        audio.addEventListener('pause', function() {
+            // Remove visual feedback when paused
+            const card = audio.closest('.podcast-card');
+            if (card) {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                card.style.boxShadow = 'none';
+            }
+        });
+        
+        audio.addEventListener('ended', function() {
+            // Reset visual feedback when ended
+            const card = audio.closest('.podcast-card');
+            if (card) {
+                card.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                card.style.boxShadow = 'none';
+            }
+        });
+        
+        // Add loading state
+        audio.addEventListener('loadstart', function() {
+            const card = audio.closest('.podcast-card');
+            if (card) {
+                const durationElement = card.querySelector('.podcast-duration span:last-child');
+                if (durationElement) {
+                    durationElement.textContent = '⏳ Cargando...';
+                }
+            }
+        });
+        
+        // Update duration when loaded
+        audio.addEventListener('loadedmetadata', function() {
+            const card = audio.closest('.podcast-card');
+            if (card) {
+                const durationElement = card.querySelector('.podcast-duration span:last-child');
+                if (durationElement) {
+                    durationElement.textContent = '🎧 Listo para reproducir';
+                }
+            }
+        });
+    });
 }
