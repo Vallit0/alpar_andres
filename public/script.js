@@ -1096,6 +1096,84 @@ function initializePodcasts() {
 // D-ID Agent Management
 let didAgentLoaded = false;
 let didAgentScript = null;
+let mediaStream = null;
+
+// Configure getUserMedia correctly for D-ID Agent
+function configureUserMedia() {
+    return new Promise((resolve, reject) => {
+        console.log('Configuring getUserMedia for D-ID Agent...');
+        
+        // Check if getUserMedia is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            const error = 'getUserMedia no está soportado por tu navegador';
+            console.error(error);
+            reject(new Error(error));
+            return;
+        }
+        
+        // Request camera and microphone access
+        navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                width: { ideal: 1280 },
+                height: { ideal: 720 },
+                facingMode: 'user'
+            }, 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
+        })
+        .then(function(stream) {
+            console.log('getUserMedia successful:', stream);
+            mediaStream = stream;
+            
+            // Check if we have video and audio tracks
+            const videoTracks = stream.getVideoTracks();
+            const audioTracks = stream.getAudioTracks();
+            
+            console.log('Video tracks:', videoTracks.length);
+            console.log('Audio tracks:', audioTracks.length);
+            
+            if (videoTracks.length > 0) {
+                console.log('Video track settings:', videoTracks[0].getSettings());
+            }
+            if (audioTracks.length > 0) {
+                console.log('Audio track settings:', audioTracks[0].getSettings());
+            }
+            
+            resolve(stream);
+        })
+        .catch(function(error) {
+            console.error('Error al acceder a la cámara o micrófono:', error);
+            
+            // Provide specific error messages
+            let errorMessage = 'Error desconocido';
+            switch(error.name) {
+                case 'NotAllowedError':
+                    errorMessage = 'Permisos de cámara/micrófono denegados. Por favor, permite el acceso y recarga la página.';
+                    break;
+                case 'NotFoundError':
+                    errorMessage = 'No se encontraron dispositivos de cámara o micrófono.';
+                    break;
+                case 'NotReadableError':
+                    errorMessage = 'Los dispositivos están siendo utilizados por otra aplicación.';
+                    break;
+                case 'OverconstrainedError':
+                    errorMessage = 'Los dispositivos no cumplen con los requisitos de calidad.';
+                    break;
+                case 'SecurityError':
+                    errorMessage = 'Error de seguridad. Asegúrate de que la página se carga sobre HTTPS.';
+                    break;
+                default:
+                    errorMessage = `Error: ${error.message}`;
+            }
+            
+            console.error(errorMessage);
+            reject(new Error(errorMessage));
+        });
+    });
+}
 
 function initializeDIDAgent() {
     console.log('Initializing D-ID Agent...');
@@ -1117,29 +1195,52 @@ function initializeDIDAgent() {
         console.error('D-ID script element not found');
     }
     
-    // Wait for agent to load and apply styling
-    setTimeout(() => {
-        const agentElement = document.querySelector('[data-name="did-agent"]');
-        if (agentElement) {
-            applyAgentStyling(agentElement);
-            didAgentLoaded = true;
-            console.log('D-ID Agent loaded successfully');
-        } else {
-            console.log('D-ID Agent not found, retrying...');
-            // Retry after 3 seconds
+    // Configure getUserMedia first
+    configureUserMedia()
+        .then((stream) => {
+            console.log('Media access granted, proceeding with D-ID Agent initialization');
+            
+            // Wait for agent to load and apply styling
             setTimeout(() => {
                 const agentElement = document.querySelector('[data-name="did-agent"]');
                 if (agentElement) {
                     applyAgentStyling(agentElement);
                     didAgentLoaded = true;
-                    console.log('D-ID Agent loaded on retry');
+                    console.log('D-ID Agent loaded successfully');
                 } else {
-                    console.error('D-ID Agent failed to load after retry');
-                    console.log('Available elements with data-name:', document.querySelectorAll('[data-name]'));
+                    console.log('D-ID Agent not found, retrying...');
+                    // Retry after 3 seconds
+                    setTimeout(() => {
+                        const agentElement = document.querySelector('[data-name="did-agent"]');
+                        if (agentElement) {
+                            applyAgentStyling(agentElement);
+                            didAgentLoaded = true;
+                            console.log('D-ID Agent loaded on retry');
+                        } else {
+                            console.error('D-ID Agent failed to load after retry');
+                            console.log('Available elements with data-name:', document.querySelectorAll('[data-name]'));
+                        }
+                    }, 3000);
                 }
-            }, 3000);
-        }
-    }, 2000);
+            }, 2000);
+        })
+        .catch((error) => {
+            console.error('Failed to get media access:', error);
+            
+            // Show user-friendly error message
+            const agentContainer = document.getElementById('did-agent-container');
+            if (agentContainer) {
+                agentContainer.innerHTML = `
+                    <div style="padding: 20px; text-align: center; color: #ff6b6b;">
+                        <h3>⚠️ Acceso a Cámara/Micrófono Requerido</h3>
+                        <p>${error.message}</p>
+                        <button onclick="location.reload()" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                            Recargar Página
+                        </button>
+                    </div>
+                `;
+            }
+        });
 }
 
 function applyAgentStyling(agentElement) {
@@ -1188,6 +1289,18 @@ function applyAgentStyling(agentElement) {
     console.log('D-ID Agent styling applied');
 }
 
+// Clean up media stream
+function cleanupMediaStream() {
+    if (mediaStream) {
+        console.log('Cleaning up media stream...');
+        mediaStream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Stopped track:', track.kind);
+        });
+        mediaStream = null;
+    }
+}
+
 // Initialize D-ID Agent management
 function initializeDIDAgentManagement() {
     // Add error listeners for debugging
@@ -1220,6 +1333,9 @@ function initializeDIDAgentManagement() {
                         applyAgentStyling(agentElement);
                     }
                 }, 100);
+            } else {
+                // Clean up media stream when switching away from agent tab
+                cleanupMediaStream();
             }
         };
     }

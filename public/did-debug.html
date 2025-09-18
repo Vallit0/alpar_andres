@@ -51,6 +51,14 @@
         <div id="agent-details"></div>
     </div>
     
+    <div class="debug-section" id="media">
+        <h2>Media Access Test</h2>
+        <div id="media-details"></div>
+        <button onclick="testGetUserMedia()" style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 10px 0;">
+            Test Camera & Microphone
+        </button>
+    </div>
+    
     <div class="debug-section" id="errors">
         <h2>Errors</h2>
         <div id="error-details"></div>
@@ -165,6 +173,72 @@ Headers: ${JSON.stringify([...response.headers.entries()], null, 2)}</pre>
                 </div>
             `;
         });
+        
+        // Test getUserMedia function
+        function testGetUserMedia() {
+            const mediaDetails = document.getElementById('media-details');
+            mediaDetails.innerHTML = '<div class="warning">🔄 Testing media access...</div>';
+            
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                mediaDetails.innerHTML = '<div class="error">❌ getUserMedia not supported</div>';
+                return;
+            }
+            
+            navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'
+                }, 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            })
+            .then(function(stream) {
+                const videoTracks = stream.getVideoTracks();
+                const audioTracks = stream.getAudioTracks();
+                
+                mediaDetails.innerHTML = `
+                    <div class="success">✅ Media access successful</div>
+                    <pre>Video tracks: ${videoTracks.length}
+Audio tracks: ${audioTracks.length}
+Video settings: ${JSON.stringify(videoTracks[0]?.getSettings(), null, 2)}
+Audio settings: ${JSON.stringify(audioTracks[0]?.getSettings(), null, 2)}</pre>
+                `;
+                
+                // Stop the stream after testing
+                stream.getTracks().forEach(track => track.stop());
+            })
+            .catch(function(error) {
+                let errorMessage = 'Unknown error';
+                switch(error.name) {
+                    case 'NotAllowedError':
+                        errorMessage = 'Permission denied';
+                        break;
+                    case 'NotFoundError':
+                        errorMessage = 'No devices found';
+                        break;
+                    case 'NotReadableError':
+                        errorMessage = 'Devices in use';
+                        break;
+                    case 'OverconstrainedError':
+                        errorMessage = 'Constraints not met';
+                        break;
+                    case 'SecurityError':
+                        errorMessage = 'Security error (HTTPS required)';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                
+                mediaDetails.innerHTML = `
+                    <div class="error">❌ Media access failed: ${errorMessage}</div>
+                    <pre>Error: ${JSON.stringify(error, null, 2)}</pre>
+                `;
+            });
+        }
         
         // Initialize debug info
         document.addEventListener('DOMContentLoaded', collectDebugInfo);
