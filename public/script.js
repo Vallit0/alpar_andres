@@ -926,7 +926,7 @@ class AlparBot {
         }
         
         // Also hide any existing fabio agent elements
-        const fabioElements = document.querySelectorAll('[data-name="did-agent-fabio"]');
+        const fabioElements = document.querySelectorAll('[data-name="did-agent"]');
         fabioElements.forEach(element => {
             element.style.display = 'none';
         });

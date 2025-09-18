@@ -2026,7 +2026,7 @@ body.homepage-active .bottom-input-bar {
 }
 
 /* Hide fabio agent elements when not on homepage */
-body:not(.homepage-active) [data-name="did-agent-fabio"] {
+body:not(.homepage-active) [data-name="did-agent"] {
     display: none !important;
 }
 
