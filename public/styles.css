@@ -2055,29 +2055,32 @@ body.homepage-active .bottom-input-bar {
 /* D-ID Agent Container */
 #did-agent-container {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100vh;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    height: 70vh;
+    max-width: 800px;
+    max-height: 600px;
     z-index: 1000;
     background: #151517;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 /* D-ID Agent Styling - Only in agent tab */
 #did-agent-container [data-name="did-agent"] {
     width: 100% !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
+    height: 100% !important;
+    min-height: 100% !important;
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    border-radius: 0 !important;
+    border-radius: 12px !important;
     overflow: hidden !important;
     box-shadow: none !important;
     display: block !important;
-    position: absolute !important;
+    position: relative !important;
     top: 0 !important;
     left: 0 !important;
     right: 0 !important;
@@ -2089,17 +2092,17 @@ body.homepage-active .bottom-input-bar {
 /* Force D-ID agent iframe sizing */
 #did-agent-container [data-name="did-agent"] iframe {
     width: 100% !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
+    height: 100% !important;
+    min-height: 100% !important;
     border: none !important;
-    border-radius: 0 !important;
+    border-radius: 12px !important;
 }
 
 /* Force D-ID agent container */
 #did-agent-container [data-name="did-agent"] > div {
     width: 100% !important;
-    height: 100vh !important;
-    min-height: 100vh !important;
+    height: 100% !important;
+    min-height: 100% !important;
 }
 
 /* Additional D-ID agent styling */
@@ -2115,6 +2118,11 @@ body.homepage-active .bottom-input-bar {
 
 /* Hide agent container when not in agent tab */
 .tab-content:not(.active) #did-agent-container {
+    display: none !important;
+}
+
+/* Hide input bar when in Sofia tab */
+body.sofia-active .bottom-input-bar {
     display: none !important;
 }
 
@@ -2249,6 +2257,13 @@ body.homepage-active .bottom-input-bar {
     
     .agent-section {
         padding: 20px;
+    }
+    
+    /* Responsive D-ID Agent Container */
+    #did-agent-container {
+        width: 95% !important;
+        height: 60vh !important;
+        max-height: 500px !important;
     }
     
     .agent-features {

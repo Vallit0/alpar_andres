@@ -8,6 +8,8 @@ class AlparBot {
         this.initializeMarkdown();
         this.initializeCharts();
         this.checkServerHealth();
+        // Ensure clean state on initialization
+        document.body.classList.remove('sofia-active');
     }
 
     initializeElements() {
@@ -810,6 +812,7 @@ class AlparBot {
             this.homeContent.classList.add('active');
             // Set homepage as active
             document.body.classList.add('homepage-active');
+            document.body.classList.remove('sofia-active');
             // Refresh scroll animations for homepage
             if (window.scrollAnimations) {
                 setTimeout(() => {
@@ -819,15 +822,17 @@ class AlparBot {
         } else if (tabName === 'chat') {
             this.chatTab.classList.add('active');
             this.chatContent.classList.add('active');
-            // Remove homepage class
+            // Remove homepage and Sofia classes
             document.body.classList.remove('homepage-active');
+            document.body.classList.remove('sofia-active');
             // Focus input when switching to chat
             setTimeout(() => this.messageInput.focus(), 100);
         } else if (tabName === 'agent') {
             this.agentTab.classList.add('active');
             this.agentContent.classList.add('active');
-            // Remove homepage class
+            // Remove homepage class and add Sofia active class
             document.body.classList.remove('homepage-active');
+            document.body.classList.add('sofia-active');
         }
         
         // Debug: Check which tabs are active
@@ -1140,47 +1145,47 @@ function unloadDIDAgent() {
 
 function applyAgentStyling(agentElement) {
     console.log('Applying D-ID Agent styling...');
-    
+
     // Hide the intro section and show the agent
     const agentContent = document.getElementById('agentContent');
     agentContent.classList.add('agent-loaded');
-    
-    // Force full screen sizing
+
+    // Force compact sizing
     agentElement.style.width = '100%';
-    agentElement.style.height = '100vh';
-    agentElement.style.minHeight = '100vh';
+    agentElement.style.height = '100%';
+    agentElement.style.minHeight = '100%';
     agentElement.style.maxWidth = '100%';
     agentElement.style.margin = '0';
     agentElement.style.padding = '0';
-    agentElement.style.borderRadius = '0';
+    agentElement.style.borderRadius = '12px';
     agentElement.style.overflow = 'hidden';
     agentElement.style.display = 'block';
-    agentElement.style.position = 'absolute';
+    agentElement.style.position = 'relative';
     agentElement.style.top = '0';
     agentElement.style.left = '0';
     agentElement.style.right = '0';
     agentElement.style.bottom = '0';
     agentElement.style.zIndex = '1000';
     agentElement.style.background = '#151517';
-    
+
     // Force sizing on any iframes
     const iframes = agentElement.querySelectorAll('iframe');
     iframes.forEach(iframe => {
         iframe.style.width = '100%';
-        iframe.style.height = '100vh';
-        iframe.style.minHeight = '100vh';
+        iframe.style.height = '100%';
+        iframe.style.minHeight = '100%';
         iframe.style.border = 'none';
-        iframe.style.borderRadius = '0';
+        iframe.style.borderRadius = '12px';
     });
-    
+
     // Force sizing on any child divs
     const childDivs = agentElement.querySelectorAll('div');
     childDivs.forEach(div => {
         div.style.width = '100%';
-        div.style.height = '100vh';
-        div.style.minHeight = '100vh';
+        div.style.height = '100%';
+        div.style.minHeight = '100%';
     });
-    
+
     console.log('D-ID Agent styling applied');
 }
 
