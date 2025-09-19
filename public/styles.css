@@ -2028,7 +2028,7 @@ body.homepage-active .bottom-input-bar {
     display: none !important;
 }
 
-/* Hide all Sofia-related content in other tabs */
+/* Hide all Alp-Air-related content in other tabs */
 .tab-content:not(.active) .agent-icon,
 .tab-content:not(.active) .agent-title,
 .tab-content:not(.active) .agent-description,
@@ -2121,7 +2121,7 @@ body.homepage-active .bottom-input-bar {
     display: none !important;
 }
 
-/* Hide input bar when in Sofia tab */
+/* Hide input bar when in Alp-Air tab */
 body.sofia-active .bottom-input-bar {
     display: none !important;
 }
