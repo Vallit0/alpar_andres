@@ -17,7 +17,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 🔥 CREDENCIALES HARDCODEADAS - CONFIGURACIÓN DEL PORTAL AZURE
 const AZURE_CONFIG = {
   PROJECT_URL: 'https://senorialesbot-resource.services.ai.azure.com/api/projects/senorialesbot',
-  AGENT_ID: 'asst_hx5VrHF3g3CEJ7MBDj5A9gBl'
+  AGENT_ID: 'asst_T2Ng0OAbJRfXNvzATw7jINtd'
 };
 
 // Initialize Azure AI Projects client
