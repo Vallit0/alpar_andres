@@ -822,7 +822,7 @@ class AlparBot {
         } else if (tabName === 'chat') {
             this.chatTab.classList.add('active');
             this.chatContent.classList.add('active');
-            // Remove homepage and Alp-Air classes
+            // Remove homepage and Ali classes
             document.body.classList.remove('homepage-active');
             document.body.classList.remove('sofia-active');
             // Focus input when switching to chat
@@ -830,7 +830,7 @@ class AlparBot {
         } else if (tabName === 'agent') {
             this.agentTab.classList.add('active');
             this.agentContent.classList.add('active');
-            // Remove homepage class and add Alp-Air active class
+            // Remove homepage class and add Ali active class
             document.body.classList.remove('homepage-active');
             document.body.classList.add('sofia-active');
         }
@@ -1255,7 +1255,7 @@ async function initializeDIDAgent() {
                                         background: #4CAF50; color: white; padding: 10px 15px;
                                         border-radius: 5px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
                                     `;
-                                    successDiv.innerHTML = '✅ Alp-Air está lista para hablar contigo';
+                                    successDiv.innerHTML = '✅ Ali está lista para hablar contigo';
                                     agentContainer.appendChild(successDiv);
                                     
                                     // Remove success message after 3 seconds
@@ -1340,7 +1340,7 @@ async function initializeDIDAgent() {
                             background: #4CAF50; color: white; padding: 10px 15px;
                             border-radius: 5px; font-size: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.3);
                         `;
-                        successDiv.innerHTML = '✅ Alp-Air está lista para hablar contigo';
+                        successDiv.innerHTML = '✅ Ali está lista para hablar contigo';
                         agentContainer.appendChild(successDiv);
                         
                         // Remove success message after 3 seconds
@@ -1388,7 +1388,7 @@ async function initializeDIDAgent() {
                 } else if (error.message.includes('HTTPS')) {
                     errorIcon = '🔒';
                     errorTitle = 'Conexión Segura Requerida';
-                    errorMessage = 'Alp-Air requiere una conexión HTTPS para funcionar correctamente.';
+                    errorMessage = 'Ali requiere una conexión HTTPS para funcionar correctamente.';
                 } else if (error.message.includes('dispositivos')) {
                     errorIcon = '📷';
                     errorTitle = 'Dispositivos No Encontrados';
@@ -1464,7 +1464,7 @@ function ensureAgentLoader(agentContainer) {
         loader.id = 'did-agent-loader';
         loader.innerHTML = `
             <div class="did-agent-spinner" aria-hidden="true"></div>
-            <h3>Inicializando Alp-Air...</h3>
+            <h3>Inicializando Ali...</h3>
             <p>Configurando acceso a cámara y micrófono</p>
         `;
         agentContainer.appendChild(loader);
